@@ -45,13 +45,10 @@ public class Orchid
     {
         properties.put(name, value);
 
-        try
-        {
+        try {
             if (callbacks.get(name) != null)
                 callbacks.get(name).invoke(null);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.println("Property \"" + name + "\" callback invoke failed");
         }
     }
@@ -74,13 +71,10 @@ public class Orchid
     public static void main(String[] args)
     {
         // Configuration loading
-        try
-        {
+        try {
             SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
             parser.parse(new File("./res/config.xml"), new ConfigHandler());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -110,27 +104,15 @@ public class Orchid
     // Configuration file XML handler
     private static class ConfigHandler extends DefaultHandler
     {
-        private String element, name, value;
-        private Method callback;
+        private String element, name, value, callback;
 
         @Override
         public void startElement(String namespace, String lName, String gName, Attributes attr)
         {
             element = gName;
 
-            if (element.equals("callback"))
-            {
-                String method = attr.getValue("method");
-
-                try
-                {
-                    callback = Orchid.class.getMethod(method);
-                }
-                catch (NoSuchMethodException e)
-                {
-                    System.err.println("Callback \"" + method + "\" is not found");
-                }
-            }
+            if (element.equals("property"))
+                name = value = callback = null;
         }
 
         @Override
@@ -140,24 +122,35 @@ public class Orchid
             if (new String(characters, start, length).trim().length() == 0)
                 return;
 
-            if (element.equals("name"))
-                name = new String(characters, start, length);
-            else if (element.equals("value"))
-                value = new String(characters, start, length);
+            switch (element) {
+                case "name":
+                    name = new String(characters, start, length);
+                    break;
+                case "value":
+                    value = new String(characters, start, length);
+                    break;
+                case "callback":
+                    callback = new String(characters, start, length);
+                    break;
+            }
         }
 
         @Override
         public void endElement(String namespace, String lName, String gName)
         {
-            if (gName.equals("property"))
-            {
-                properties.put(name, value);
-                if (callback != null)
-                    callbacks.put(name, callback);
-            }
+            if (gName.equals("property") || name == null || value == null)
+                return;
 
-            if (gName.equals("callback"))
-                callback = null;
+            properties.put(name, value);
+
+            if (callback != null) {
+                try {
+                    Method method = Orchid.class.getMethod(callback);
+                    callbacks.put(name, method);
+                } catch (NoSuchMethodException e) {
+                    System.err.println("Callback \"" + callback + "\"is not found");
+                }
+            }
         }
     }
 }
