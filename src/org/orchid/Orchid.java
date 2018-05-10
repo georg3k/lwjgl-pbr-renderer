@@ -73,7 +73,57 @@ public class Orchid
         // Configuration loading
         try {
             SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-            parser.parse(new File("./res/config.xml"), new ConfigHandler());
+            parser.parse(new File("./res/config.xml"), new DefaultHandler()
+            {
+                private String element, name, value, callback;
+
+                @Override
+                public void startElement(String namespace, String lName, String gName, Attributes attr)
+                {
+                    element = gName;
+
+                    if (element.equals("property"))
+                        name = value = callback = null;
+                }
+
+                @Override
+                public void characters(char[] characters, int start, int length)
+                {
+                    // Ignoring whitespace padding
+                    if (new String(characters, start, length).trim().length() == 0)
+                        return;
+
+                    switch (element) {
+                        case "name":
+                            name = new String(characters, start, length);
+                            break;
+                        case "value":
+                            value = new String(characters, start, length);
+                            break;
+                        case "callback":
+                            callback = new String(characters, start, length);
+                            break;
+                    }
+                }
+
+                @Override
+                public void endElement(String namespace, String lName, String gName)
+                {
+                    if (gName.equals("property") || name == null || value == null)
+                        return;
+
+                    properties.put(name, value);
+
+                    if (callback != null) {
+                        try {
+                            Method method = Orchid.class.getMethod(callback);
+                            callbacks.put(name, method);
+                        } catch (NoSuchMethodException e) {
+                            System.err.println("Callback \"" + callback + "\"is not found");
+                        }
+                    }
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,59 +148,6 @@ public class Orchid
 
             glfwPollEvents();
             glfwSwapBuffers(window);
-        }
-    }
-
-    // Configuration file XML handler
-    private static class ConfigHandler extends DefaultHandler
-    {
-        private String element, name, value, callback;
-
-        @Override
-        public void startElement(String namespace, String lName, String gName, Attributes attr)
-        {
-            element = gName;
-
-            if (element.equals("property"))
-                name = value = callback = null;
-        }
-
-        @Override
-        public void characters(char[] characters, int start, int length)
-        {
-            // Ignoring whitespace padding
-            if (new String(characters, start, length).trim().length() == 0)
-                return;
-
-            switch (element) {
-                case "name":
-                    name = new String(characters, start, length);
-                    break;
-                case "value":
-                    value = new String(characters, start, length);
-                    break;
-                case "callback":
-                    callback = new String(characters, start, length);
-                    break;
-            }
-        }
-
-        @Override
-        public void endElement(String namespace, String lName, String gName)
-        {
-            if (gName.equals("property") || name == null || value == null)
-                return;
-
-            properties.put(name, value);
-
-            if (callback != null) {
-                try {
-                    Method method = Orchid.class.getMethod(callback);
-                    callbacks.put(name, method);
-                } catch (NoSuchMethodException e) {
-                    System.err.println("Callback \"" + callback + "\"is not found");
-                }
-            }
         }
     }
 }
