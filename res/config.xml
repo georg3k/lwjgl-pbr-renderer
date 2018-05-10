@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<configuration>
+    <callback method="windowCallback">
+        <property>
+            <name>window_width</name>
+            <value>800</value>
+        </property>
+        <property>
+            <name>window_height</name>
+            <value>480</value>
+        </property>
+        <property>
+            <name>window_title</name>
+            <value>Orchid</value>
+        </property>
+    </callback>
+</configuration>
