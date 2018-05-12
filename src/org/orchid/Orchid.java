@@ -24,7 +24,7 @@ public class Orchid
     private static Map<String, Method> callbacks = new HashMap<>();
 
     private static Node sceneTree;
-    private static Map<String, Node> sceneMap = new HashMap<>();
+    private static Camera mainCamera;
 
     /**
      * Property getter
@@ -63,6 +63,16 @@ public class Orchid
         glfwSetWindowSize(window, Integer.parseInt(getProperty("window_width")),
                 Integer.parseInt(getProperty("window_height")));
         glfwSetWindowTitle(window, getProperty("window_title"));
+    }
+
+    /**
+     * Sets camera to render from
+     *
+     * @param camera camera to set as main
+     */
+    public static void setMainCamera(Camera camera)
+    {
+        mainCamera = camera;
     }
 
     /**
@@ -182,7 +192,6 @@ public class Orchid
                             node = new Node(id, node);
                             if (sceneTree == null)
                                 sceneTree = node;
-                            sceneMap.put(id, node);
                             break;
                     }
                 }

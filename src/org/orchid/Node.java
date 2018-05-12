@@ -1,6 +1,5 @@
 package org.orchid;
 
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -115,6 +114,30 @@ public class Node
     {
         children.get(index).setParent(null);
         children.remove(index);
+    }
+
+    /**
+     * Removes node from children
+     *
+     * @param node child node
+     */
+    public void removeChild(Node node)
+    {
+        if (!children.contains(node))
+            return;
+
+        node.setParent(null);
+        children.remove(node);
+    }
+
+    /**
+     * Removes node from scene
+     */
+    public void remove()
+    {
+        parent.removeChild(this);
+        for (Node n : children)
+            n.remove();
     }
 
     /**
@@ -265,23 +288,17 @@ public class Node
      *
      * @return model matrix in the global space
      */
-    private Matrix4f getModelMatrix()
+    public Matrix4f getModelMatrix()
     {
         if (!matrixUpdated)
-            // TODO: Check for math correctness
-            return modelMatrix.identity().mul(positionMatrix).mul(rotationMatrix).mul(scaleMatrix);
+            recalculateModelMatrix();
 
-        Matrix4f resultMatrix = new Matrix4f();
-        if (parent != null)
-            resultMatrix.set(parent.getModelMatrix());
-
-        // TODO: Check for math correctness
-        return resultMatrix.mul(modelMatrix);
+        return modelMatrix;
 
     }
 
     // Sets node (and all its' children) matrices outdated status and forces node to recalculate them for optimization
-    private void setOutdated()
+    protected void setOutdated()
     {
         matrixUpdated = false;
         for (Node n : children)
@@ -305,5 +322,15 @@ public class Node
     {
         scaleMatrix.identity().scale(scale);
         setOutdated();
+    }
+
+    private void recalculateModelMatrix()
+    {
+        // TODO: Check for math correctness
+        modelMatrix.mul(positionMatrix).mul(rotationMatrix).mul(scaleMatrix);
+        if(parent != null)
+            modelMatrix.set(parent.getModelMatrix().mul(modelMatrix));
+
+        matrixUpdated = true;
     }
 }
