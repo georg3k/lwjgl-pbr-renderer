@@ -6,7 +6,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +22,9 @@ public class Orchid
     private static long window;
     private static Map<String, String> properties = new HashMap<>();
     private static Map<String, Method> callbacks = new HashMap<>();
+
+    private static Node sceneTree;
+    private static Map<String, Node> sceneMap = new HashMap<>();
 
     /**
      * Property getter
@@ -70,63 +72,8 @@ public class Orchid
      */
     public static void main(String[] args)
     {
-        // Configuration loading
-        try {
-            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-            parser.parse(new File("./res/config.xml"), new DefaultHandler()
-            {
-                private String element, name, value, callback;
-
-                @Override
-                public void startElement(String namespace, String lName, String gName, Attributes attr)
-                {
-                    element = gName;
-
-                    if (element.equals("property"))
-                        name = value = callback = null;
-                }
-
-                @Override
-                public void characters(char[] characters, int start, int length)
-                {
-                    // Ignoring whitespace padding
-                    if (new String(characters, start, length).trim().length() == 0)
-                        return;
-
-                    switch (element) {
-                        case "name":
-                            name = new String(characters, start, length);
-                            break;
-                        case "value":
-                            value = new String(characters, start, length);
-                            break;
-                        case "callback":
-                            callback = new String(characters, start, length);
-                            break;
-                    }
-                }
-
-                @Override
-                public void endElement(String namespace, String lName, String gName)
-                {
-                    if (gName.equals("property") || name == null || value == null)
-                        return;
-
-                    properties.put(name, value);
-
-                    if (callback != null) {
-                        try {
-                            Method method = Orchid.class.getMethod(callback);
-                            callbacks.put(name, method);
-                        } catch (NoSuchMethodException e) {
-                            System.err.println("Callback \"" + callback + "\"is not found");
-                        }
-                    }
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        loadConfiguration("./res/config.xml");
+        loadScene(getProperty("main_scene"));
 
         if (!glfwInit())
             throw new RuntimeException("GLFW initialization failed");
@@ -148,6 +95,142 @@ public class Orchid
 
             glfwPollEvents();
             glfwSwapBuffers(window);
+        }
+    }
+
+    private static void loadConfiguration(String path)
+    {
+        try {
+            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+            parser.parse(path, new DefaultHandler()
+            {
+                private String element, name, value, callback;
+
+                @Override
+                public void startElement(String namespace, String lName, String gName, Attributes attr)
+                {
+                    element = gName;
+
+                    if (element.equals("property"))
+                        name = value = callback = null;
+                }
+
+                @Override
+                public void characters(char[] characters, int start, int length)
+                {
+                    // Ignoring whitespace padding
+                    if (new String(characters, start, length).trim().length() == 0)
+                        return;
+
+                    switch (element)
+                    {
+                        case "name":
+                            name = new String(characters, start, length);
+                            break;
+                        case "value":
+                            value = new String(characters, start, length);
+                            break;
+                        case "callback":
+                            callback = new String(characters, start, length);
+                            break;
+                    }
+                }
+
+                @Override
+                public void endElement(String namespace, String lName, String gName)
+                {
+                    if (gName.equals("property") || name == null || value == null)
+                        return;
+
+                    properties.put(name, value);
+
+                    if (callback != null)
+                    {
+                        try {
+                            Method method = Orchid.class.getMethod(callback);
+                            callbacks.put(name, method);
+                        } catch (NoSuchMethodException e) {
+                            System.err.println("Callback \"" + callback + "\"is not found");
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Configuration file loading failed");
+            e.printStackTrace();
+        }
+    }
+
+    private static void loadScene(String path)
+    {
+        try {
+            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+            parser.parse(path, new DefaultHandler()
+            {
+                String element;
+                Node node = null;
+                float[] values = new float[4];
+
+                @Override
+                public void startElement(String namespace, String lName, String gName, Attributes attr)
+                {
+                    element = gName;
+                    switch (gName)
+                    {
+                        case "node":
+                            String id = attr.getValue("id");
+                            node = new Node(id, node);
+                            if (sceneTree == null)
+                                sceneTree = node;
+                            sceneMap.put(id, node);
+                            break;
+                    }
+                }
+
+                @Override
+                public void characters(char[] characters, int start, int length)
+                {
+                    // Ignoring whitespace padding
+                    if (new String(characters, start, length).trim().length() == 0)
+                        return;
+
+                    switch (element)
+                    {
+                        case "x":
+                            values[0] = Float.parseFloat(new String(characters, start, length));
+                            break;
+                        case "y":
+                            values[1] = Float.parseFloat(new String(characters, start, length));
+                            break;
+                        case "z":
+                            values[2] = Float.parseFloat(new String(characters, start, length));
+                            break;
+                    }
+                }
+
+                @Override
+                public void endElement(String namespace, String lName, String gName)
+                {
+                    switch (gName)
+                    {
+                        case "node":
+                            node = node.getParent();
+                            break;
+                        case "position":
+                            node.setPosition(values[0], values[1], values[2]);
+                            break;
+                        case "rotation":
+                            node.setRotation(values[0], values[1], values[2]);
+                            break;
+                        case "scale":
+                            node.setScale(values[0], values[1], values[2]);
+                            break;
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Scene file loading failed");
+            e.printStackTrace();
         }
     }
 }

@@ -15,4 +15,8 @@
         <value>Orchid</value>
         <callback>windowCallback</callback>
     </property>
+    <property>
+        <name>main_scene</name>
+        <value>./res/scenes/scene.xml</value>
+    </property>
 </configuration>
