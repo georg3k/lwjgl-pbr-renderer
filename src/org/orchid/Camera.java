@@ -14,22 +14,22 @@ public class Camera extends Node
     /**
      * Constructor
      *
-     * @param id unique identifier
+     * @param name unique identifier
      */
-    public Camera(String id)
+    public Camera(String name)
     {
-        super(id);
+        super(name);
     }
 
     /**
      * Constructor
      *
-     * @param id     unique identifier
+     * @param name   node name
      * @param parent parent node
      */
-    public Camera(String id, Node parent)
+    public Camera(String name, Node parent)
     {
-        super(id, parent);
+        super(name, parent);
     }
 
     /**

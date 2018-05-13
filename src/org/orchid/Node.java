@@ -4,14 +4,18 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Node class - represents 3d scene entity
  */
 public class Node
 {
-    private String id;
+    private String name;
 
     private Vector3f position = new Vector3f(0.0f);
     private Vector3f rotation = new Vector3f();
@@ -19,6 +23,7 @@ public class Node
 
     private Node parent;
     private List<Node> children = new ArrayList<>();
+    private Map<String, Node> childrenMap = new HashMap<>();
 
     private Matrix4f positionMatrix = new Matrix4f();
     private Matrix4f rotationMatrix = new Matrix4f();
@@ -31,22 +36,22 @@ public class Node
     /**
      * Constructor
      *
-     * @param id unique identifier of the node
+     * @param name name of the node
      */
-    public Node(String id)
+    public Node(String name)
     {
-        this.id = id;
+        this.name = name;
     }
 
     /**
      * Constructor
      *
-     * @param id     unique identifier of the node
+     * @param name     name of the node
      * @param parent parent of the node
      */
-    public Node(String id, Node parent)
+    public Node(String name, Node parent)
     {
-        this(id);
+        this(name);
         setParent(parent);
     }
 
@@ -83,7 +88,7 @@ public class Node
     }
 
     /**
-     * Child getter
+     * Child getter by index
      *
      * @param index index of the child
      * @return child node
@@ -94,13 +99,45 @@ public class Node
     }
 
     /**
+     * Child getter by name
+     *
+     * @param name name of the child
+     * @return child node
+     */
+    public Node getChild(String name)
+    {
+        return childrenMap.get(name);
+    }
+
+    /**
      * Adds new child node
      *
      * @param child new child
      */
     public void addChild(Node child)
     {
+        // Same name avoidance
+        int index = 0;
+        Pattern p = Pattern.compile(child.name + "\\s*(\\d*)$");
+        for(Node n : children)
+        {
+            Matcher m = p.matcher(n.name);
+
+            if(m.matches())
+            {
+                index = 1;
+                if(m.groupCount() > 1)
+                    index = index < Integer.parseInt(m.group(1)) ? Integer.parseInt(m.group(1)) : index;
+            }
+        }
+
+        if(index != 0)
+            // A little  encapsulation violation, but who cares?
+            child.name += " " + index;
+
         children.add(child);
+        childrenMap.put(child.getName(), child);
+
         if (child.getParent() != this)
             child.setParent(this);
     }
@@ -112,6 +149,7 @@ public class Node
      */
     public void removeChild(int index)
     {
+        childrenMap.remove(children.get(index).getName());
         children.get(index).setParent(null);
         children.remove(index);
     }
@@ -128,6 +166,7 @@ public class Node
 
         node.setParent(null);
         children.remove(node);
+        childrenMap.remove(node.getName());
     }
 
     /**
@@ -145,9 +184,9 @@ public class Node
      *
      * @return unique identifier
      */
-    public String getId()
+    public String getName()
     {
-        return id;
+        return name;
     }
 
     /**

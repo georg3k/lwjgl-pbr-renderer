@@ -2,9 +2,9 @@
 <!-- Demo scene -->
 <scene>
     <tree>
-        <!-- "id" is a mandatory attribute, the value should be always unique -->
-        <node id="A">
-            <node id="B">
+        <!-- "name" is a mandatory attribute, the value should be always unique in this level -->
+        <node name="A">
+            <node name="B">
                 <!-- Vector values can be either omitted or verbosely described -->
                 <position>
                     <x>-1.0</x>
@@ -22,7 +22,7 @@
                     <z>2.0</z>
                 </rotation>
             </node>
-            <node id="C">
+            <node name="C">
                 <position>
                     <x>1.0</x>
                     <y>2.0</y>

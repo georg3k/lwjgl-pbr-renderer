@@ -188,8 +188,11 @@ public class Orchid
                     switch (gName)
                     {
                         case "node":
-                            String id = attr.getValue("id");
-                            node = new Node(id, node);
+                            String name = attr.getValue("name");
+                            if(name == null)
+                                throw new RuntimeException("Node name is not defined in scene file");
+
+                            node = new Node(name, node);
                             if (sceneTree == null)
                                 sceneTree = node;
                             break;
