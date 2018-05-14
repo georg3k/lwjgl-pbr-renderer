@@ -1,6 +1,14 @@
 package org.orchid;
 
 import org.joml.Matrix4f;
+import org.lwjgl.BufferUtils;
+
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL31.*;
 
 public class Camera extends Node
 {
@@ -10,6 +18,9 @@ public class Camera extends Node
     private float fov = 1.0f;
     private Matrix4f viewMatrix = new Matrix4f();
     private Matrix4f projectionMatrix = new Matrix4f();
+    private int buffer;
+    private FloatBuffer viewBuffer = BufferUtils.createFloatBuffer(16);
+    private FloatBuffer projectionBuffer = BufferUtils.createFloatBuffer(16);
 
     /**
      * Constructor
@@ -19,6 +30,11 @@ public class Camera extends Node
     public Camera(String name)
     {
         super(name);
+
+        buffer = glGenBuffers();
+        glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+        glBufferData(GL_UNIFORM_BUFFER, 128, GL_STATIC_DRAW);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
     /**
@@ -29,7 +45,8 @@ public class Camera extends Node
      */
     public Camera(String name, Node parent)
     {
-        super(name, parent);
+        this(name);
+        setParent(parent);
     }
 
     /**
@@ -116,6 +133,14 @@ public class Camera extends Node
         return new Matrix4f(projectionMatrix);
     }
 
+    /**
+     * Bind view and projection matrices buffer to shader
+     */
+    public void bindBuffer()
+    {
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, buffer);
+    }
+
     @Override
     protected void setOutdated()
     {
@@ -125,14 +150,24 @@ public class Camera extends Node
 
     private void recalculateViewMatrix()
     {
+        viewBuffer.clear();
         viewMatrix.set(getModelMatrix()).invert();
+        viewMatrix.get(viewBuffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, viewBuffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         matrixUpdated = true;
     }
 
     private void recalculateProjectionMatrix()
     {
+        projectionBuffer.clear();
         projectionMatrix.identity().perspective(fov,
                 Float.parseFloat(Orchid.getProperty("window_width")) /
                         Float.parseFloat(Orchid.getProperty("window_height")), near, far);
+        projectionMatrix.get(projectionBuffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+        glBufferSubData(GL_UNIFORM_BUFFER, 64, projectionBuffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 }

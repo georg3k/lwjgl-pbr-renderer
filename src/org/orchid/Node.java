@@ -125,15 +125,16 @@ public class Node
 
             if(m.matches())
             {
-                index = 1;
-                if(m.groupCount() > 1)
+                if(index == 0) index = 1;
+
+                if(m.group(1).length() > 0) {
                     index = index < Integer.parseInt(m.group(1)) ? Integer.parseInt(m.group(1)) : index;
+                }
             }
         }
 
         if(index != 0)
-            // A little  encapsulation violation, but who cares?
-            child.name += " " + index;
+            child.name = child.name.replaceAll("\\s*\\d*$",  " " + (index + 1));
 
         children.add(child);
         childrenMap.put(child.getName(), child);
