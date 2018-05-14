@@ -147,6 +147,8 @@ public class Camera extends Node
      */
     public void bindBuffer()
     {
+        if (!matrixUpdated)
+            recalculateViewMatrix();
         glBindBufferBase(GL_UNIFORM_BUFFER, Shader.CAMERA_BLOCK, vbo);
     }
 

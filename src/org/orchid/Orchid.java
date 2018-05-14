@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Main class - loads configuration and scene files and manages game loop
@@ -31,6 +30,8 @@ public class Orchid
 
     private static Node sceneTree;
     private static Camera mainCamera;
+
+    private static Shader forwardShader;
 
     /**
      * Property getter
@@ -95,6 +96,7 @@ public class Orchid
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, GLFW_TRUE);
 
         window = glfwCreateWindow(Integer.parseInt(getProperty("window_width")),
                 Integer.parseInt(getProperty("window_height")), getProperty("window_title"), 0, 0);
@@ -104,12 +106,22 @@ public class Orchid
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
 
+        glEnable(GL_DEPTH);
+
         // Scene loading invokes some of GL functions so it should be performed after context creation
         loadScene(getProperty("main_scene"));
+
+        // Forward shader loading
+        forwardShader = new Shader("./res/shaders/forward_vertex.glsl",
+                "./res/shaders/forward_frag.glsl");
 
         while (!glfwWindowShouldClose(window))
         {
             glClear(GL_COLOR_BUFFER_BIT);
+
+            forwardShader.use();
+            mainCamera.bindBuffer();
+            sceneTree.update();
 
             glfwPollEvents();
             glfwSwapBuffers(window);
@@ -211,6 +223,9 @@ public class Orchid
                                 throw new RuntimeException("Node name is not defined in scene file");
 
                             node = new Camera(name, node);
+
+                            if (mainCamera == null)
+                                mainCamera = (Camera) node;
                             break;
                     }
                 }

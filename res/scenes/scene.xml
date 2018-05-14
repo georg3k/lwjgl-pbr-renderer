@@ -8,18 +8,13 @@
                 <position>
                     <x>0.0</x>
                     <y>0.0</y>
-                    <z>2.0</z>
+                    <z>5.0</z>
                 </position>
                 <near>0.01</near>
                 <far>1000.0</far>
-                <fov>0.8</fov>
+                <fov>1.0</fov>
             </camera>
             <node name="box">
-                <position>
-                    <x>0.1</x>
-                    <y>-0.1</y>
-                    <z>0.2</z>
-                </position>
                 <mesh>./res/meshes/box.fbx</mesh>
             </node>
         </node>

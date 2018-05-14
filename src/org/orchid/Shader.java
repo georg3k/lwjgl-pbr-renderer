@@ -43,13 +43,13 @@ public class Shader
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, vertexSource);
         glCompileShader(vertexShader);
-        if (glGetShaderInfoLog(vertexShader).equals(""))
+        if (!glGetShaderInfoLog(vertexShader).equals(""))
             System.err.println(glGetShaderInfoLog(vertexShader));
 
         int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragmentShader, fragmentSource);
         glCompileShader(fragmentShader);
-        if (glGetShaderInfoLog(fragmentShader).equals(""))
+        if (!glGetShaderInfoLog(fragmentShader).equals(""))
             System.err.println(glGetShaderInfoLog(fragmentShader));
 
         program = glCreateProgram();
@@ -57,6 +57,8 @@ public class Shader
         glAttachShader(program, fragmentShader);
 
         glLinkProgram(program);
+        if (!glGetProgramInfoLog(program).equals(""))
+            System.err.println(glGetProgramInfoLog(program));
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);

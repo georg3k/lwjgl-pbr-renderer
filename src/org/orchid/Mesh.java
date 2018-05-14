@@ -50,7 +50,8 @@ public class Mesh extends Node
      */
     public Mesh(String name, Node parent)
     {
-        super(name, parent);
+        this(name);
+        setParent(parent);
     }
 
     /**
@@ -78,7 +79,7 @@ public class Mesh extends Node
     {
         FloatBuffer vertices = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);
         FloatBuffer normals = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);
-        FloatBuffer bitangent = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);
+        FloatBuffer bitangents = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);
         FloatBuffer uvs = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 2);
 
         boolean hasNormals = aiMesh.mNormals() != null;
@@ -97,9 +98,9 @@ public class Mesh extends Node
             }
 
             if (hasBitangents) {
-                bitangent.put(aiMesh.mBitangents().get(i).x());
-                bitangent.put(aiMesh.mBitangents().get(i).y());
-                bitangent.put(aiMesh.mBitangents().get(i).z());
+                bitangents.put(aiMesh.mBitangents().get(i).x());
+                bitangents.put(aiMesh.mBitangents().get(i).y());
+                bitangents.put(aiMesh.mBitangents().get(i).z());
             }
 
             if (hasUVs) {
@@ -121,6 +122,7 @@ public class Mesh extends Node
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
+        vertices.rewind();
         verticesBuffer = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, verticesBuffer);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
@@ -129,6 +131,7 @@ public class Mesh extends Node
         glVertexAttribPointer(Shader.POSITION_LOCATION, 3, GL_FLOAT, false, 0, 0);
 
         if (hasNormals) {
+            normals.rewind();
             normalsBuffer = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
             glBufferData(GL_ARRAY_BUFFER, normals, GL_STATIC_DRAW);
@@ -138,15 +141,17 @@ public class Mesh extends Node
         }
 
         if (hasBitangents) {
+            bitangents.rewind();
             bitangentsBuffer = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, bitangentsBuffer);
-            glBufferData(GL_ARRAY_BUFFER, normals, GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, bitangents, GL_STATIC_DRAW);
 
             glEnableVertexAttribArray(Shader.BITANGENT_LOCATION);
             glVertexAttribPointer(Shader.BITANGENT_LOCATION, 3, GL_FLOAT, false, 0, 0);
         }
 
         if (hasUVs) {
+            uvs.rewind();
             uvsBuffer = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, uvsBuffer);
             glBufferData(GL_ARRAY_BUFFER, normals, GL_STATIC_DRAW);
@@ -155,6 +160,7 @@ public class Mesh extends Node
             glVertexAttribPointer(Shader.UVS_LOCATION, 2, GL_FLOAT, false, 0, 0);
         }
 
+        indices.rewind();
         int elementsBuffer = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementsBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
@@ -163,9 +169,22 @@ public class Mesh extends Node
     }
 
     /**
-     * Draws mesh
+     * Updates node and all its' children
      */
-    public void draw()
+    public void update()
+    {
+        draw();
+        super.update();
+    }
+
+    @Override
+    protected void setOutdated()
+    {
+        matrixUpdated = false;
+        super.setOutdated();
+    }
+
+    private void draw()
     {
         if (!matrixUpdated) {
             matrixBuffer.clear();
@@ -181,12 +200,5 @@ public class Mesh extends Node
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, numFaces, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-    }
-
-    @Override
-    protected void setOutdated()
-    {
-        matrixUpdated = false;
-        super.setOutdated();
     }
 }

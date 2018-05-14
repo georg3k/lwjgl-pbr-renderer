@@ -142,6 +142,8 @@ public class Node
         children.add(child);
         childrenMap.put(child.getName(), child);
 
+        child.setOutdated();
+
         if (child.getParent() != this)
             child.setParent(this);
     }
@@ -336,7 +338,7 @@ public class Node
         if (!matrixUpdated)
             recalculateModelMatrix();
 
-        return modelMatrix;
+        return new Matrix4f(modelMatrix);
 
     }
 
@@ -356,8 +358,7 @@ public class Node
 
     private void recalculateRotation()
     {
-        // TODO: Check for math correctness
-        rotationMatrix.rotation(1.0f, rotation);
+        rotationMatrix.rotationXYZ(rotation.x(), rotation.y(), rotation.z());
         setOutdated();
     }
 
@@ -369,7 +370,6 @@ public class Node
 
     private void recalculateModelMatrix()
     {
-        // TODO: Check for math correctness
         modelMatrix.mul(positionMatrix).mul(rotationMatrix).mul(scaleMatrix);
         if(parent != null)
             modelMatrix.set(parent.getModelMatrix().mul(modelMatrix));
