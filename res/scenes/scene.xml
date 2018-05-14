@@ -3,31 +3,24 @@
 <scene>
     <tree>
         <!-- "name" is a mandatory attribute, the value should be always unique in this level -->
-        <node name="A">
-            <node name="B">
-                <!-- Vector values can be either omitted or verbosely described -->
+        <node name="root">
+            <camera name="cam">
                 <position>
-                    <x>-1.0</x>
-                    <y>-2.0</y>
-                    <z>-3.0</z>
-                </position>
-                <scale>
-                    <x>-1.0</x>
-                    <y>-32.0</y>
-                    <z>-3.0</z>
-                </scale>
-                <rotation>
-                    <x>10.0</x>
-                    <y>500.0</y>
+                    <x>0.0</x>
+                    <y>0.0</y>
                     <z>2.0</z>
-                </rotation>
-            </node>
-            <node name="C">
-                <position>
-                    <x>1.0</x>
-                    <y>2.0</y>
-                    <z>3.0</z>
                 </position>
+                <near>0.01</near>
+                <far>1000.0</far>
+                <fov>0.8</fov>
+            </camera>
+            <node name="box">
+                <position>
+                    <x>0.1</x>
+                    <y>-0.1</y>
+                    <z>0.2</z>
+                </position>
+                <mesh>./res/meshes/box.fbx</mesh>
             </node>
         </node>
     </tree>

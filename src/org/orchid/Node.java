@@ -116,6 +116,9 @@ public class Node
      */
     public void addChild(Node child)
     {
+        if (childrenMap.containsKey(child.getName()))
+            return;
+
         // Same name avoidance
         int index = 0;
         Pattern p = Pattern.compile(child.name + "\\s*(\\d*)$");

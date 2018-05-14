@@ -3,12 +3,11 @@ package org.orchid;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL30.glBindBufferBase;
+import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
 
 public class Camera extends Node
 {
@@ -18,7 +17,7 @@ public class Camera extends Node
     private float fov = 1.0f;
     private Matrix4f viewMatrix = new Matrix4f();
     private Matrix4f projectionMatrix = new Matrix4f();
-    private int buffer;
+    private int vbo;
     private FloatBuffer viewBuffer = BufferUtils.createFloatBuffer(16);
     private FloatBuffer projectionBuffer = BufferUtils.createFloatBuffer(16);
 
@@ -31,8 +30,8 @@ public class Camera extends Node
     {
         super(name);
 
-        buffer = glGenBuffers();
-        glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+        vbo = glGenBuffers();
+        glBindBuffer(GL_UNIFORM_BUFFER, vbo);
         glBufferData(GL_UNIFORM_BUFFER, 128, GL_STATIC_DRAW);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
@@ -47,6 +46,16 @@ public class Camera extends Node
     {
         this(name);
         setParent(parent);
+    }
+
+    /**
+     * Removes camera from scene
+     */
+    @Override
+    public void remove()
+    {
+        glDeleteBuffers(vbo);
+        super.remove();
     }
 
     /**
@@ -134,11 +143,11 @@ public class Camera extends Node
     }
 
     /**
-     * Bind view and projection matrices buffer to shader
+     * Bind view and projection matrices vbo to shader
      */
     public void bindBuffer()
     {
-        glBindBufferBase(GL_UNIFORM_BUFFER, 0, buffer);
+        glBindBufferBase(GL_UNIFORM_BUFFER, Shader.CAMERA_BLOCK, vbo);
     }
 
     @Override
@@ -153,7 +162,7 @@ public class Camera extends Node
         viewBuffer.clear();
         viewMatrix.set(getModelMatrix()).invert();
         viewMatrix.get(viewBuffer);
-        glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, vbo);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, viewBuffer);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
         matrixUpdated = true;
@@ -166,7 +175,7 @@ public class Camera extends Node
                 Float.parseFloat(Orchid.getProperty("window_width")) /
                         Float.parseFloat(Orchid.getProperty("window_height")), near, far);
         projectionMatrix.get(projectionBuffer);
-        glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, vbo);
         glBufferSubData(GL_UNIFORM_BUFFER, 64, projectionBuffer);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }

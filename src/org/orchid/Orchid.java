@@ -1,5 +1,11 @@
 package org.orchid;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.assimp.AIMesh;
+import org.lwjgl.assimp.AINode;
+import org.lwjgl.assimp.AIScene;
+import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GL;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
@@ -83,7 +89,6 @@ public class Orchid
     public static void main(String[] args)
     {
         loadConfiguration("./res/config.xml");
-        loadScene(getProperty("main_scene"));
 
         if (!glfwInit())
             throw new RuntimeException("GLFW initialization failed");
@@ -98,6 +103,9 @@ public class Orchid
 
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
+
+        // Scene loading invokes some of GL functions so it should be performed after context creation
+        loadScene(getProperty("main_scene"));
 
         while (!glfwWindowShouldClose(window))
         {
@@ -178,6 +186,7 @@ public class Orchid
             parser.parse(path, new DefaultHandler()
             {
                 String element;
+                String chars;
                 Node node = null;
                 float[] values = new float[4];
 
@@ -195,6 +204,13 @@ public class Orchid
                             node = new Node(name, node);
                             if (sceneTree == null)
                                 sceneTree = node;
+                            break;
+                        case "camera":
+                            name = attr.getValue("name");
+                            if (name == null)
+                                throw new RuntimeException("Node name is not defined in scene file");
+
+                            node = new Camera(name, node);
                             break;
                     }
                 }
@@ -217,6 +233,18 @@ public class Orchid
                         case "z":
                             values[2] = Float.parseFloat(new String(characters, start, length));
                             break;
+                        case "mesh":
+                            chars = new String(characters, start, length);
+                            break;
+                        case "near":
+                            ((Camera) node).setNear(Float.parseFloat(new String(characters, start, length)));
+                            break;
+                        case "far":
+                            ((Camera) node).setFar(Float.parseFloat(new String(characters, start, length)));
+                            break;
+                        case "fov":
+                            ((Camera) node).setFOV(Float.parseFloat(new String(characters, start, length)));
+                            break;
                     }
                 }
 
@@ -226,6 +254,7 @@ public class Orchid
                     switch (gName)
                     {
                         case "node":
+                        case "camera":
                             node = node.getParent();
                             break;
                         case "position":
@@ -237,7 +266,48 @@ public class Orchid
                         case "scale":
                             node.setScale(values[0], values[1], values[2]);
                             break;
+                        case "mesh":
+                            AIScene scene = Assimp.aiImportFile(chars,
+                                    Assimp.aiProcess_Triangulate
+                                            | Assimp.aiProcess_FlipUVs
+                                            | Assimp.aiProcess_CalcTangentSpace);
+                            node.addChild(loadModel(scene.mRootNode(), scene));
+                            break;
                     }
+                }
+
+                private Node loadModel(AINode aiNode, AIScene aiScene)
+                {
+                    Node newNode = new Node(aiNode.mName().dataString());
+
+                    Matrix4f matrix = new Matrix4f(
+                            aiNode.mTransformation().a1(), aiNode.mTransformation().b1(), aiNode.mTransformation().c1(), aiNode.mTransformation().d1(),
+                            aiNode.mTransformation().a2(), aiNode.mTransformation().b2(), aiNode.mTransformation().c2(), aiNode.mTransformation().d2(),
+                            aiNode.mTransformation().a3(), aiNode.mTransformation().b3(), aiNode.mTransformation().c3(), aiNode.mTransformation().d3(),
+                            aiNode.mTransformation().a4(), aiNode.mTransformation().b4(), aiNode.mTransformation().c4(), aiNode.mTransformation().d4()
+                    );
+
+                    Vector3f mediator = new Vector3f();
+
+                    matrix.getTranslation(mediator);
+                    newNode.setPosition(mediator);
+
+                    matrix.getEulerAnglesZYX(mediator);
+                    newNode.setRotation(mediator);
+
+                    matrix.getScale(mediator);
+                    newNode.setScale(mediator);
+
+                    for (int i = 0; i < aiNode.mNumMeshes(); i++) {
+                        AIMesh aiMesh = AIMesh.create(aiScene.mMeshes().get(aiNode.mMeshes().get(i)));
+                        Mesh mesh = new Mesh(aiMesh.mName().dataString(), newNode);
+                        mesh.loadMesh(aiMesh);
+                    }
+
+                    for (int i = 0; i < aiNode.mNumChildren(); i++)
+                        newNode.addChild(loadModel(AINode.create(aiNode.mChildren().get(i)), aiScene));
+
+                    return newNode;
                 }
             });
         } catch (Exception e) {
