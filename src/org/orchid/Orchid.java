@@ -18,6 +18,9 @@ import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 
 /**
  * Main class - loads configuration and scene files and manages game loop
@@ -25,6 +28,15 @@ import static org.lwjgl.opengl.GL11.*;
 public class Orchid
 {
     private static long window;
+
+    private static int frameBuffer;
+    private static int colorBuffer;
+    private static int depthBuffer;
+
+    private static int renderQuadArray;
+    private static int verticesBuffer;
+    private static int uvsBuffer;
+
     private static Map<String, String> properties = new HashMap<>();
     private static Map<String, Method> callbacks = new HashMap<>();
 
@@ -32,6 +44,7 @@ public class Orchid
     private static Camera mainCamera;
 
     private static Shader forwardShader;
+    private static Shader combineShader;
 
     /**
      * Property getter
@@ -106,8 +119,6 @@ public class Orchid
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
 
-        glEnable(GL_DEPTH);
-
         // Scene loading invokes some of GL functions so it should be performed after context creation
         loadScene(getProperty("main_scene"));
 
@@ -115,17 +126,38 @@ public class Orchid
         forwardShader = new Shader("./res/shaders/forward_vertex.glsl",
                 "./res/shaders/forward_frag.glsl");
 
+        // Combining shader loading
+        combineShader = new Shader("./res/shaders/combine_vertex.glsl",
+                "./res/shaders/combine_frag.glsl");
+
+        genFramebuffer();
+        genRenderquad();
+
         while (!glfwWindowShouldClose(window))
         {
-            glClear(GL_COLOR_BUFFER_BIT);
+            glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glEnable(GL_DEPTH_TEST);
 
             forwardShader.use();
             mainCamera.bindBuffer();
             sceneTree.update();
 
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glClear(GL_COLOR_BUFFER_BIT);
+            glDisable(GL_DEPTH_TEST);
+
+            combineShader.use();
+            glBindVertexArray(renderQuadArray);
+            glBindTexture(GL_TEXTURE_2D, colorBuffer);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+
             glfwPollEvents();
             glfwSwapBuffers(window);
         }
+
+        cleanupFramebuffer();
+        cleanupRenderquad();
     }
 
     private static void loadConfiguration(String path)
@@ -329,5 +361,88 @@ public class Orchid
             System.err.println("Scene file loading failed");
             e.printStackTrace();
         }
+    }
+
+    private static void genFramebuffer()
+    {
+        frameBuffer = glGenFramebuffers();
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+        colorBuffer = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, colorBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Integer.parseInt(getProperty("window_width")),
+                Integer.parseInt(getProperty("window_height")), 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorBuffer, 0);
+
+        depthBuffer = glGenRenderbuffers();
+        glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Integer.parseInt(getProperty("window_width")),
+                Integer.parseInt(getProperty("window_height")));
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            System.err.println("Framebuffer is not ready");
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    private static void cleanupFramebuffer()
+    {
+        glDeleteFramebuffers(frameBuffer);
+        glDeleteTextures(colorBuffer);
+        glDeleteRenderbuffers(depthBuffer);
+    }
+
+    private static void genRenderquad()
+    {
+        float[] vertices = {
+                -1.0f, 1.0f,
+                -1.0f, -1.0f,
+                1.0f, -1.0f,
+                -1.0f, 1.0f,
+                1.0f, -1.0f,
+                1.0f, 1.0f,
+        };
+
+        float[] uvs = {
+                0.0f, 1.0f,
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+        };
+
+        renderQuadArray = glGenVertexArrays();
+        glBindVertexArray(renderQuadArray);
+
+        verticesBuffer = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, verticesBuffer);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(Shader.POSITION_LOCATION);
+        glVertexAttribPointer(Shader.POSITION_LOCATION, 2, GL_FLOAT, false, 0, 0);
+
+        uvsBuffer = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, uvsBuffer);
+        glBufferData(GL_ARRAY_BUFFER, uvs, GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(Shader.UVS_LOCATION);
+        glVertexAttribPointer(Shader.UVS_LOCATION, 2, GL_FLOAT, false, 0, 0);
+
+        glBindVertexArray(0);
+    }
+
+    private static void cleanupRenderquad()
+    {
+        glDeleteVertexArrays(renderQuadArray);
+        glDeleteBuffers(verticesBuffer);
+        glDeleteBuffers(uvsBuffer);
     }
 }
