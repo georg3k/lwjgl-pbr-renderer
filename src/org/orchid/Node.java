@@ -352,13 +352,13 @@ public class Node
 
     private void recalculatePosition()
     {
-        positionMatrix.translation(position);
+        positionMatrix.identity().translation(position);
         setOutdated();
     }
 
     private void recalculateRotation()
     {
-        rotationMatrix.rotationXYZ(rotation.x(), rotation.y(), rotation.z());
+        rotationMatrix.identity().rotateXYZ(rotation);
         setOutdated();
     }
 
@@ -370,7 +370,7 @@ public class Node
 
     private void recalculateModelMatrix()
     {
-        modelMatrix.mul(positionMatrix).mul(rotationMatrix).mul(scaleMatrix);
+        modelMatrix.identity().mul(positionMatrix).mul(rotationMatrix).mul(scaleMatrix);
         if(parent != null)
             modelMatrix.set(parent.getModelMatrix().mul(modelMatrix));
 

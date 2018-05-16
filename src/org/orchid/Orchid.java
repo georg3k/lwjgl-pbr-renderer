@@ -46,6 +46,8 @@ public class Orchid
     private static Shader forwardShader;
     private static Shader combineShader;
 
+    private static double deltaTime;
+
     /**
      * Property getter
      *
@@ -96,6 +98,16 @@ public class Orchid
     }
 
     /**
+     * Delta time of last rendered frame
+     *
+     * @return delta time
+     */
+    public static double getDeltaTime()
+    {
+        return deltaTime;
+    }
+
+    /**
      * Entry point method
      *
      * @param args default argument list (not used)
@@ -133,8 +145,17 @@ public class Orchid
         genFramebuffer();
         genRenderquad();
 
+        double lastTime = 0.0;
+        double currentTime;
+
+        float rot = 0.0f;
+
         while (!glfwWindowShouldClose(window))
         {
+            currentTime = glfwGetTime();
+            deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
             glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glEnable(GL_DEPTH_TEST);
