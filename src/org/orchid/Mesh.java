@@ -169,22 +169,9 @@ public class Mesh extends Node
     }
 
     /**
-     * Updates node and all its' children
+     * Draws mesh
      */
-    public void update()
-    {
-        draw();
-        super.update();
-    }
-
-    @Override
-    protected void setOutdated()
-    {
-        matrixUpdated = false;
-        super.setOutdated();
-    }
-
-    private void draw()
+    public void draw()
     {
         if (!matrixUpdated) {
             matrixBuffer.clear();
@@ -200,5 +187,12 @@ public class Mesh extends Node
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, numFaces, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+    }
+
+    @Override
+    protected void setOutdated()
+    {
+        matrixUpdated = false;
+        super.setOutdated();
     }
 }

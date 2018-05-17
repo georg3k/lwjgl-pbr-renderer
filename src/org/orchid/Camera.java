@@ -145,7 +145,7 @@ public class Camera extends Node
     /**
      * Bind view and projection matrices vbo to shader
      */
-    public void bindBuffer()
+    public void use()
     {
         if (!matrixUpdated)
             recalculateViewMatrix();
@@ -174,8 +174,8 @@ public class Camera extends Node
     {
         projectionBuffer.clear();
         projectionMatrix.identity().perspective(fov,
-                Float.parseFloat(Orchid.getProperty("window_width")) /
-                        Float.parseFloat(Orchid.getProperty("window_height")), near, far);
+                Float.parseFloat(Configuration.getProperty("window_width")) /
+                        Float.parseFloat(Configuration.getProperty("window_height")), near, far);
         projectionMatrix.get(projectionBuffer);
         glBindBuffer(GL_UNIFORM_BUFFER, vbo);
         glBufferSubData(GL_UNIFORM_BUFFER, 64, projectionBuffer);
