@@ -12,5 +12,5 @@ layout (location = 0) out vec4 fragment;
 
 void main()
 {
-    fragment = texture(albedo_metalness, uv_frag);
+    fragment = vec4(texture(albedo_metalness, uv_frag).rgb, 1.0);
 }

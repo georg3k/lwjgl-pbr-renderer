@@ -24,6 +24,8 @@ public class Mesh extends Node
     private int ebo;
     private int numFaces;
 
+    private Material material;
+
     private boolean matrixUpdated = false;
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
@@ -68,6 +70,26 @@ public class Mesh extends Node
         glDeleteBuffers(uvsBuffer);
 
         super.remove();
+    }
+
+    /**
+     * Material getter
+     *
+     * @return material
+     */
+    public Material getMaterial()
+    {
+        return material;
+    }
+
+    /**
+     * Material setter
+     *
+     * @param material material
+     */
+    public void setMaterial(Material material)
+    {
+        this.material = material;
     }
 
     /**
@@ -154,7 +176,7 @@ public class Mesh extends Node
             uvs.rewind();
             uvsBuffer = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, uvsBuffer);
-            glBufferData(GL_ARRAY_BUFFER, normals, GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, uvs, GL_STATIC_DRAW);
 
             glEnableVertexAttribArray(Shader.UVS_LOCATION);
             glVertexAttribPointer(Shader.UVS_LOCATION, 2, GL_FLOAT, false, 0, 0);
@@ -182,6 +204,8 @@ public class Mesh extends Node
 
             matrixUpdated = true;
         }
+
+        material.use();
 
         glBindBufferBase(GL_UNIFORM_BUFFER, Shader.MODEL_BLOCK, ubo);
         glBindVertexArray(vao);

@@ -238,7 +238,7 @@ public class Orchid
         deferredAlbedoMetalnessBuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, deferredAlbedoMetalnessBuffer);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight,
-                0, GL_RGBA, GL_UNSIGNED_INT, 0);
+                0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -248,7 +248,7 @@ public class Orchid
         deferredNormalRoughnessBuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, deferredNormalRoughnessBuffer);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight,
-                0, GL_RGBA, GL_FLOAT, 0);
+                0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -268,7 +268,7 @@ public class Orchid
         deferredAmbientOcclusionBuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, deferredAmbientOcclusionBuffer);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowWidth, windowHeight,
-                0, GL_RGB, GL_FLOAT, 0);
+                0, GL_RGB, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
