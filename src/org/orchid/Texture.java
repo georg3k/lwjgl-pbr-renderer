@@ -4,11 +4,13 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.stb.STBImage.*;
+import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class Texture
 {
@@ -52,6 +54,8 @@ public class Texture
                 GL_RGBA, GL_UNSIGNED_BYTE, textureData);
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
+
+        stbi_image_free(textureData);
 
         loadedTextures.put(path, texture);
     }

@@ -17,6 +17,11 @@ public class Orchid
     private static long window;
     private static int windowHeight, windowWidth;
 
+    // Skybox data
+    private static int skyboxCubeArray;
+    private static int skyboxVerticesBuffer;
+    private static Cubemap skyboxCubemap;
+
     // Output render quad data
     private static int renderQuadArray;
     private static int verticesBuffer;
@@ -41,6 +46,7 @@ public class Orchid
     private static Shader forwardShader;
     private static Shader combineShader;
     private static Shader postprocessingShader;
+    private static Shader skyboxShader;
 
     private static double deltaTime;
 
@@ -122,11 +128,16 @@ public class Orchid
         postprocessingShader = new Shader("./res/shaders/postprocessing_vertex.glsl",
                 "./res/shaders/postprocessing_frag.glsl");
 
+        // Skybox shader loading
+        skyboxShader = new Shader("./res/shaders/skybox_vertex.glsl",
+                "./res/shaders/skybox_frag.glsl");
+
 
         genDepthbuffer();
         genDeferredFramebuffer();
         genFramebuffer();
         genRenderquad();
+        genSkybox();
 
         double lastTime = 0.0;
         double currentTime;
@@ -142,6 +153,7 @@ public class Orchid
             Scene.update();
 
             deferredPass();
+            skyboxPass();
             forwardPass();
             postprocessingPass();
 
@@ -151,6 +163,19 @@ public class Orchid
 
         cleanupFramebuffer();
         cleanupRenderquad();
+        cleanupSkybox();
+    }
+
+    private static void skyboxPass()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+        glEnable(GL_DEPTH_TEST);
+
+        skyboxShader.use();
+        glActiveTexture(GL_TEXTURE10);
+        skyboxCubemap.use();
+        drawSkybox();
+
     }
 
     private static void deferredPass()
@@ -164,6 +189,7 @@ public class Orchid
 
         glDisable(GL_DEPTH_TEST);
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         combineShader.use();
@@ -180,8 +206,6 @@ public class Orchid
         glBindTexture(GL_TEXTURE_2D, deferredAmbientOcclusionBuffer);
 
         drawRenderquad();
-
-
     }
 
     private static void forwardPass()
@@ -379,5 +403,88 @@ public class Orchid
         glDeleteVertexArrays(renderQuadArray);
         glDeleteBuffers(verticesBuffer);
         glDeleteBuffers(uvsBuffer);
+    }
+
+    private static void genSkybox()
+    {
+        float skyboxVertices[] = {
+                -1.0f, 1.0f, -1.0f,
+                -1.0f, -1.0f, -1.0f,
+                1.0f, -1.0f, -1.0f,
+                1.0f, -1.0f, -1.0f,
+                1.0f, 1.0f, -1.0f,
+                -1.0f, 1.0f, -1.0f,
+
+                -1.0f, -1.0f, 1.0f,
+                -1.0f, -1.0f, -1.0f,
+                -1.0f, 1.0f, -1.0f,
+                -1.0f, 1.0f, -1.0f,
+                -1.0f, 1.0f, 1.0f,
+                -1.0f, -1.0f, 1.0f,
+
+                1.0f, -1.0f, -1.0f,
+                1.0f, -1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, -1.0f,
+                1.0f, -1.0f, -1.0f,
+
+                -1.0f, -1.0f, 1.0f,
+                -1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, -1.0f, 1.0f,
+                -1.0f, -1.0f, 1.0f,
+
+                -1.0f, 1.0f, -1.0f,
+                1.0f, 1.0f, -1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                -1.0f, 1.0f, 1.0f,
+                -1.0f, 1.0f, -1.0f,
+
+                -1.0f, -1.0f, -1.0f,
+                -1.0f, -1.0f, 1.0f,
+                1.0f, -1.0f, -1.0f,
+                1.0f, -1.0f, -1.0f,
+                -1.0f, -1.0f, 1.0f,
+                1.0f, -1.0f, 1.0f
+        };
+
+        String[] skyboxPaths = {
+                "./res/textures/skybox_posx.hdr",
+                "./res/textures/skybox_negx.hdr",
+                "./res/textures/skybox_posy.hdr",
+                "./res/textures/skybox_negy.hdr",
+                "./res/textures/skybox_posz.hdr",
+                "./res/textures/skybox_negz.hdr",
+        };
+        skyboxCubemap = new Cubemap(skyboxPaths);
+
+        skyboxCubeArray = glGenVertexArrays();
+        glBindVertexArray(skyboxCubeArray);
+
+        skyboxVerticesBuffer = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, skyboxVerticesBuffer);
+        glBufferData(GL_ARRAY_BUFFER, skyboxVertices, GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(Shader.POSITION_LOCATION);
+        glVertexAttribPointer(Shader.POSITION_LOCATION, 3, GL_FLOAT, false, 0, 0);
+
+        glBindVertexArray(0);
+    }
+
+    private static void drawSkybox()
+    {
+        glBindVertexArray(skyboxCubeArray);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    }
+
+    private static void cleanupSkybox()
+    {
+        skyboxCubemap.remove();
+        glDeleteVertexArrays(skyboxCubeArray);
+        glDeleteBuffers(verticesBuffer);
     }
 }
