@@ -1,12 +1,17 @@
 package org.orchid;
 
-import org.joml.*;
-import org.lwjgl.assimp.*;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.assimp.AIMesh;
+import org.lwjgl.assimp.AINode;
+import org.lwjgl.assimp.AIScene;
+import org.lwjgl.assimp.Assimp;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.*;
-import java.util.*;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.util.ArrayList;
 
 public class Scene
 {
@@ -14,6 +19,7 @@ public class Scene
     private static Camera mainCamera;
     private static ArrayList<Mesh> opaqueMeshes = new ArrayList<>();
     private static ArrayList<Mesh> transparentMeshes = new ArrayList<>();
+    private static Material defaultMaterial = new Material();
 
     /**
      * Updates scene
@@ -57,13 +63,15 @@ public class Scene
         opaqueMeshes.clear();
         transparentMeshes.clear();
 
+        // TODO: Scene handler works okay, but it's ugly and strongly needs refactoring
         try {
             SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
             parser.parse(path, new DefaultHandler()
             {
-                String element, value;
+                String element, value, meshPath;
                 boolean isTransparent = false;
                 Node node = null;
+                Material material = null;
                 ArrayList<Float> values = new ArrayList<>();
 
                 @Override
@@ -82,6 +90,8 @@ public class Scene
                             if (mainCamera == null)
                                 mainCamera = (Camera) node;
                             break;
+                        case "material":
+                            material = new Material();
                     }
                 }
 
@@ -98,6 +108,12 @@ public class Scene
                         case "x":
                         case "y":
                         case "z":
+                        case "r":
+                        case "g":
+                        case "b":
+                        case "a":
+                        case "metalness":
+                        case "roughness":
                             values.add(Float.parseFloat(value));
                             break;
                         case "near":
@@ -112,6 +128,9 @@ public class Scene
                         case "transparent":
                             isTransparent = Boolean.parseBoolean(value);
                             break;
+                        case "mesh_path":
+                            meshPath = value;
+                            break;
                     }
                 }
 
@@ -125,20 +144,63 @@ public class Scene
                             break;
                         case "position":
                             node.setPosition(values.get(0), values.get(1), values.get(2));
+                            values.clear();
                             break;
                         case "rotation":
                             node.setRotation(values.get(0), values.get(1), values.get(2));
+                            values.clear();
                             break;
                         case "scale":
                             node.setScale(values.get(0), values.get(1), values.get(2));
+                            values.clear();
                             break;
-                        case "mesh":
-                            AIScene scene = Assimp.aiImportFile(value,
+                        case "model":
+                            AIScene scene = Assimp.aiImportFile(meshPath,
                                     Assimp.aiProcess_Triangulate
                                             | Assimp.aiProcess_FlipUVs
                                             | Assimp.aiProcess_CalcTangentSpace);
 
                             node.addChild(loadModel(scene.mRootNode(), scene));
+                            meshPath = "";
+                            material = null;
+                            break;
+                        case "albedo":
+                            material.setAlbedo(values.get(0), values.get(1), values.get(2), values.get(3));
+                            values.clear();
+                            break;
+                        case "albedo_map":
+                            material.setAlbedoMap(new Texture(value));
+                            break;
+                        case "metalness":
+                            material.setMetalness(values.get(0));
+                            values.clear();
+                            break;
+                        case "metalness_map":
+                            material.setMetalnessMap(new Texture(value));
+                            break;
+                        case "roughness":
+                            material.setRoughness(values.get(0));
+                            values.clear();
+                            break;
+                        case "roughness_map":
+                            material.setRoughnessMap(new Texture(value));
+                            break;
+                        case "normal_map":
+                            material.setNormalMap(new Texture(value));
+                            break;
+                        case "emission":
+                            material.setEmission(values.get(0), values.get(1), values.get(2));
+                            values.clear();
+                            break;
+                        case "emission_map":
+                            material.setEmissionMap(new Texture(value));
+                            break;
+                        case "ambient":
+                            material.setAmbient(values.get(0), values.get(1), values.get(2));
+                            values.clear();
+                            break;
+                        case "ambient_occlusion_map":
+                            material.setAmbientOcclusionMap(new Texture(value));
                             break;
                     }
                 }
@@ -174,6 +236,11 @@ public class Scene
                             transparentMeshes.add(mesh);
                         else
                             opaqueMeshes.add(mesh);
+
+                        if (material != null)
+                            mesh.setMaterial(material);
+                        else
+                            mesh.setMaterial(defaultMaterial);
                     }
 
                     for (int i = 0; i < aiNode.mNumChildren(); i++)

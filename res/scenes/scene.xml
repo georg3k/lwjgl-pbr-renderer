@@ -8,14 +8,24 @@
                 <position>
                     <x>0.0</x>
                     <y>0.0</y>
-                    <z>5.0</z>
+                    <z>3.0</z>
                 </position>
                 <near>0.01</near>
                 <far>1000.0</far>
                 <fov>1.0</fov>
             </camera>
-            <node name="box">
-                <mesh>./res/meshes/box.fbx</mesh>
+            <node name="sphere">
+                <model>
+                    <material>
+                        <albedo_map>./res/textures/albedo.png</albedo_map>
+                        <metalness_map>./res/textures/metalness.png</metalness_map>
+                        <roughness_map>./res/textures/roughness.png</roughness_map>
+                        <normal_map>./res/textures/normal.png</normal_map>
+                        <metalness>1.0</metalness>
+                        <roughness>1.0</roughness>
+                    </material>
+                    <mesh_path>./res/meshes/sphere.fbx</mesh_path>
+                </model>
             </node>
         </node>
     </tree>
