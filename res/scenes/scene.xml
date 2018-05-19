@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <!-- Demo scene -->
 <scene>
+    <environment>
+        <skybox>
+            <positive_x>./res/textures/skybox_posx.hdr</positive_x>
+            <negative_x>./res/textures/skybox_negx.hdr</negative_x>
+            <positive_y>./res/textures/skybox_posy.hdr</positive_y>
+            <negative_y>./res/textures/skybox_negy.hdr</negative_y>
+            <positive_z>./res/textures/skybox_posz.hdr</positive_z>
+            <negative_x>./res/textures/skybox_negz.hdr</negative_x>
+        </skybox>
+    </environment>
     <tree>
-        <!-- "name" is a mandatory attribute, the value should be always unique in this level -->
         <node name="root">
-            <camera name="cam">
-                <position>
-                    <x>0.0</x>
-                    <y>0.0</y>
-                    <z>3.0</z>
-                </position>
-                <near>0.01</near>
-                <far>1000.0</far>
-                <fov>1.0</fov>
-            </camera>
+            <node name="camera_handler">
+                <camera name="camera">
+                    <position>
+                        <x>0.0</x>
+                        <y>0.0</y>
+                        <z>3.0</z>
+                    </position>
+                    <near>0.01</near>
+                    <far>1000.0</far>
+                    <fov>1.0</fov>
+                </camera>
+            </node>
             <node name="sphere">
                 <model>
                     <material>

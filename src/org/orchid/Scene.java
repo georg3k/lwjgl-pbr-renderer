@@ -12,6 +12,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Scene
 {
@@ -20,6 +21,7 @@ public class Scene
     private static ArrayList<Mesh> opaqueMeshes = new ArrayList<>();
     private static ArrayList<Mesh> transparentMeshes = new ArrayList<>();
     private static Material defaultMaterial = new Material();
+    private static Cubemap skyboxCubemap = null;
 
     /**
      * Updates scene
@@ -50,6 +52,26 @@ public class Scene
     }
 
     /**
+     * Scenes skybox cubemap getter
+     *
+     * @return skybox
+     */
+    public static Cubemap getSkybox()
+    {
+        return skyboxCubemap;
+    }
+
+    /**
+     * Scenes skybox cubemap setter
+     *
+     * @param skybox skybox
+     */
+    public static void setSkybox(Cubemap skybox)
+    {
+        skyboxCubemap = skybox;
+    }
+
+    /**
      * Loads scene
      *
      * @param path path to scene file
@@ -63,151 +85,166 @@ public class Scene
         opaqueMeshes.clear();
         transparentMeshes.clear();
 
-        // TODO: Scene handler works okay, but it's ugly and strongly needs refactoring
         try {
             SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
             parser.parse(path, new DefaultHandler()
             {
-                String element, value, meshPath;
-                boolean isTransparent = false;
-                Node node = null;
-                Material material = null;
-                ArrayList<Float> values = new ArrayList<>();
+                String name;
+                List<String> characters = new ArrayList<>();
+
+                Node node;
+                Material material;
+                boolean isMeshOpaque = true;
+
+                String[] valuebleString =
+                        {
+                                "positive_x", "negative_x", "positive_y", "negative_y", "positive_z", "negative_z",
+                                "x", "y", "z", "r", "g", "b", "a",
+                                "metalness", "roughness",
+                                "albedo_map", "metalness_map", "roughness_map", "normal_map", "emission_map", "ambient_occlusion_map",
+                                "mesh_path", "transparent",
+                                "near", "far", "fov",
+                        };
 
                 @Override
-                public void startElement(String namespace, String lName, String gName, Attributes attr)
+                public void startElement(String namespace, String localName, String globalName, Attributes attr)
                 {
-                    element = gName;
+                    name = globalName;
 
-                    switch (element) {
+                    switch (name) {
                         case "node":
                             node = new Node(attr.getValue("name"), node);
-                            if (sceneTree == null)
-                                sceneTree = node;
+                            if (sceneTree == null) sceneTree = node;
                             break;
                         case "camera":
                             node = new Camera(attr.getValue("name"), node);
-                            if (mainCamera == null)
-                                mainCamera = (Camera) node;
+                            if (mainCamera == null) mainCamera = (Camera) node;
                             break;
                         case "material":
                             material = new Material();
+                            break;
                     }
                 }
 
                 @Override
-                public void characters(char[] characters, int start, int length)
+                public void characters(char[] characters, int begin, int length)
                 {
-                    // Ignoring whitespace padding
-                    if (new String(characters, start, length).trim().length() == 0)
+                    if (new String(characters, begin, length).trim().length() == 0)
                         return;
 
-                    value = new String(characters, start, length);
-
-                    switch (element) {
-                        case "x":
-                        case "y":
-                        case "z":
-                        case "r":
-                        case "g":
-                        case "b":
-                        case "a":
-                        case "metalness":
-                        case "roughness":
-                            values.add(Float.parseFloat(value));
+                    for (String s : valuebleString)
+                        if (name.equals(s)) {
+                            this.characters.add(new String(characters, begin, length));
                             break;
-                        case "near":
-                            ((Camera) node).setNear(Float.parseFloat(value));
-                            break;
-                        case "far":
-                            ((Camera) node).setFar(Float.parseFloat(value));
-                            break;
-                        case "fov":
-                            ((Camera) node).setFOV(Float.parseFloat(value));
-                            break;
-                        case "transparent":
-                            isTransparent = Boolean.parseBoolean(value);
-                            break;
-                        case "mesh_path":
-                            meshPath = value;
-                            break;
-                    }
+                        }
                 }
 
                 @Override
-                public void endElement(String namespace, String lName, String gName)
+                public void endElement(String namespace, String localName, String globalName)
                 {
-                    switch (gName) {
+                    switch (globalName) {
+                        case "skybox":
+                            String[] strings = new String[characters.size()];
+                            characters.toArray(strings);
+                            skyboxCubemap = new Cubemap(strings);
+                            characters.clear();
+                            break;
                         case "node":
                         case "camera":
                             node = node.getParent();
                             break;
+                        case "near":
+                            ((Camera) node).setNear(Float.parseFloat(characters.get(0)));
+                            characters.clear();
+                            break;
+                        case "far":
+                            ((Camera) node).setFar(Float.parseFloat(characters.get(0)));
+                            characters.clear();
+                            break;
+                        case "fov":
+                            ((Camera) node).setFOV(Float.parseFloat(characters.get(0)));
+                            characters.clear();
+                            break;
                         case "position":
-                            node.setPosition(values.get(0), values.get(1), values.get(2));
-                            values.clear();
+                            node.setPosition(Float.parseFloat(characters.get(0)), Float.parseFloat(characters.get(1)),
+                                    Float.parseFloat(characters.get(2)));
+                            characters.clear();
                             break;
                         case "rotation":
-                            node.setRotation(values.get(0), values.get(1), values.get(2));
-                            values.clear();
+                            node.setRotation(Float.parseFloat(characters.get(0)), Float.parseFloat(characters.get(1)),
+                                    Float.parseFloat(characters.get(2)));
+                            characters.clear();
                             break;
                         case "scale":
-                            node.setScale(values.get(0), values.get(1), values.get(2));
-                            values.clear();
-                            break;
-                        case "model":
-                            AIScene scene = Assimp.aiImportFile(meshPath,
-                                    Assimp.aiProcess_Triangulate
-                                            | Assimp.aiProcess_FlipUVs
-                                            | Assimp.aiProcess_CalcTangentSpace);
-
-                            node.addChild(loadModel(scene.mRootNode(), scene));
-                            meshPath = "";
-                            material = null;
+                            node.setScale(Float.parseFloat(characters.get(0)), Float.parseFloat(characters.get(1)),
+                                    Float.parseFloat(characters.get(2)));
+                            characters.clear();
                             break;
                         case "albedo":
-                            material.setAlbedo(values.get(0), values.get(1), values.get(2), values.get(3));
-                            values.clear();
-                            break;
-                        case "albedo_map":
-                            material.setAlbedoMap(new Texture(value));
+                            material.setAlbedo(Float.parseFloat(characters.get(0)), Float.parseFloat(characters.get(1)),
+                                    Float.parseFloat(characters.get(2)), Float.parseFloat(characters.get(3)));
+                            characters.clear();
                             break;
                         case "metalness":
-                            material.setMetalness(values.get(0));
-                            values.clear();
-                            break;
-                        case "metalness_map":
-                            material.setMetalnessMap(new Texture(value));
+                            material.setMetalness(Float.parseFloat(characters.get(0)));
+                            characters.clear();
                             break;
                         case "roughness":
-                            material.setRoughness(values.get(0));
-                            values.clear();
-                            break;
-                        case "roughness_map":
-                            material.setRoughnessMap(new Texture(value));
-                            break;
-                        case "normal_map":
-                            material.setNormalMap(new Texture(value));
+                            material.setRoughness(Float.parseFloat(characters.get(0)));
+                            characters.clear();
                             break;
                         case "emission":
-                            material.setEmission(values.get(0), values.get(1), values.get(2));
-                            values.clear();
-                            break;
-                        case "emission_map":
-                            material.setEmissionMap(new Texture(value));
+                            material.setEmission(Float.parseFloat(characters.get(0)), Float.parseFloat(characters.get(1)),
+                                    Float.parseFloat(characters.get(2)));
+                            characters.clear();
                             break;
                         case "ambient":
-                            material.setAmbient(values.get(0), values.get(1), values.get(2));
-                            values.clear();
+                            material.setAmbient(Float.parseFloat(characters.get(0)), Float.parseFloat(characters.get(1)),
+                                    Float.parseFloat(characters.get(2)));
+                            characters.clear();
+                            break;
+                        case "albedo_map":
+                            material.setAlbedoMap(new Texture(characters.get(0)));
+                            characters.clear();
+                            break;
+                        case "metalness_map":
+                            material.setMetalnessMap(new Texture(characters.get(0)));
+                            characters.clear();
+                            break;
+                        case "roughness_map":
+                            material.setRoughnessMap(new Texture(characters.get(0)));
+                            characters.clear();
+                            break;
+                        case "normal_map":
+                            material.setNormalMap(new Texture(characters.get(0)));
+                            characters.clear();
+                            break;
+                        case "emission_map":
+                            material.setEmissionMap(new Texture(characters.get(0)));
+                            characters.clear();
                             break;
                         case "ambient_occlusion_map":
-                            material.setAmbientOcclusionMap(new Texture(value));
+                            material.setAmbientOcclusionMap(new Texture(characters.get(0)));
+                            characters.clear();
+                            break;
+                        case "transparent":
+                            isMeshOpaque = false;
+                            break;
+                        case "mesh_path":
+                            AIScene aiScene = Assimp.aiImportFile(characters.get(0), Assimp.aiProcess_Triangulate
+                                    | Assimp.aiProcess_FlipUVs | Assimp.aiProcess_CalcTangentSpace);
+
+                            node.addChild(loadModel(aiScene.mRootNode(), aiScene));
+                            characters.clear();
+                            isMeshOpaque = true;
+                            material = null;
                             break;
                     }
                 }
 
                 private Node loadModel(AINode aiNode, AIScene aiScene)
                 {
-                    Node newNode = new Node(aiNode.mName().dataString());
+                    Node node = new Node(aiNode.mName().dataString());
 
                     Matrix4f matrix = new Matrix4f(
                             aiNode.mTransformation().a1(), aiNode.mTransformation().b1(), aiNode.mTransformation().c1(), aiNode.mTransformation().d1(),
@@ -219,23 +256,23 @@ public class Scene
                     Vector3f mediator = new Vector3f();
 
                     matrix.getTranslation(mediator);
-                    newNode.setPosition(mediator);
+                    node.setPosition(mediator);
 
                     matrix.getEulerAnglesZYX(mediator);
-                    newNode.setRotation(mediator);
+                    node.setRotation(mediator);
 
                     matrix.getScale(mediator);
-                    newNode.setScale(mediator);
+                    node.setScale(mediator);
 
                     for (int i = 0; i < aiNode.mNumMeshes(); i++) {
                         AIMesh aiMesh = AIMesh.create(aiScene.mMeshes().get(aiNode.mMeshes().get(i)));
-                        Mesh mesh = new Mesh(aiMesh.mName().dataString(), newNode);
+                        Mesh mesh = new Mesh(aiMesh.mName().dataString(), node);
                         mesh.loadMesh(aiMesh);
 
-                        if (isTransparent)
-                            transparentMeshes.add(mesh);
-                        else
+                        if (isMeshOpaque)
                             opaqueMeshes.add(mesh);
+                        else
+                            transparentMeshes.add(mesh);
 
                         if (material != null)
                             mesh.setMaterial(material);
@@ -244,9 +281,9 @@ public class Scene
                     }
 
                     for (int i = 0; i < aiNode.mNumChildren(); i++)
-                        newNode.addChild(loadModel(AINode.create(aiNode.mChildren().get(i)), aiScene));
+                        node.addChild(loadModel(AINode.create(aiNode.mChildren().get(i)), aiScene));
 
-                    return newNode;
+                    return node;
                 }
             });
         } catch (Exception e) {
