@@ -198,11 +198,6 @@ public class Scene
                                     Float.parseFloat(characters.get(2)));
                             characters.clear();
                             break;
-                        case "ambient":
-                            material.setAmbient(Float.parseFloat(characters.get(0)), Float.parseFloat(characters.get(1)),
-                                    Float.parseFloat(characters.get(2)));
-                            characters.clear();
-                            break;
                         case "albedo_map":
                             material.setAlbedoMap(new Texture(characters.get(0)));
                             characters.clear();

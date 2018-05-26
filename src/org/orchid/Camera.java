@@ -76,7 +76,7 @@ public class Camera extends Node
     public void setNear(float near)
     {
         this.near = near;
-        recalculateProjectionMatrix();
+        matrixUpdated = false;
     }
 
     /**
@@ -97,6 +97,7 @@ public class Camera extends Node
     public void setFar(float far)
     {
         this.far = far;
+        matrixUpdated = false;
     }
 
     /**
@@ -117,6 +118,7 @@ public class Camera extends Node
     public void setFOV(float fov)
     {
         this.fov = fov;
+        recalculateProjectionMatrix();
     }
 
     /**

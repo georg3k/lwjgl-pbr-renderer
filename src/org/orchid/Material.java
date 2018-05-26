@@ -10,13 +10,13 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.glBindBufferBase;
-import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
 
 public class Material
 {
     private Vector4f albedo = new Vector4f(1.0f);
     private Texture albedoMap = null;
-    private float metalness = 0.0f;
+    ByteBuffer materialBuffer = BufferUtils.createByteBuffer(64);
     private Texture metalnessMap = null;
     private float roughness = 1.0f;
     private Texture roughnessMap = null;
@@ -24,12 +24,11 @@ public class Material
     private Texture normalMap = null;
     private Vector3f emission = new Vector3f(0.0f);
     private Texture emissionMap = null;
-    private Vector3f ambient = new Vector3f(1.0f);
     private Texture ambientOcclusionMap = null;
 
     private boolean bufferUpdated = false;
     private int buffer;
-    ByteBuffer materialBuffer = BufferUtils.createByteBuffer(80);
+    private float metalness = 1.0f;
 
     /**
      * Constructor - allocates material UBO
@@ -264,38 +263,6 @@ public class Material
     }
 
     /**
-     * Ambient value getter
-     *
-     * @return emission map
-     */
-    public Vector3f getAmbient()
-    {
-        return new Vector3f(ambient);
-    }
-
-    /**
-     * Ambient value setter
-     *
-     * @param ambient emission value
-     */
-    public void setAmbient(Vector3f ambient)
-    {
-        this.ambient.set(ambient);
-    }
-
-    /**
-     * Alternative ambient value setter
-     *
-     * @param r red component
-     * @param g green component
-     * @param b blue component
-     */
-    public void setAmbient(float r, float g, float b)
-    {
-        ambient.set(r, g, b);
-    }
-
-    /**
      * Ambient occlusion map getter
      *
      * @return ambient occlusion
@@ -358,21 +325,17 @@ public class Material
         materialBuffer.putFloat(0, albedo.x());
         materialBuffer.putFloat(4, albedo.y());
         materialBuffer.putFloat(8, albedo.z());
-        materialBuffer.putFloat(12, albedo.w());
-        materialBuffer.putInt(16, albedoMap == null ? 0 : 1);
+        materialBuffer.putInt(12, albedoMap == null ? 0 : 1);
+        materialBuffer.putInt(16, normalMap == null ? 0 : 1);
         materialBuffer.putFloat(20, metalness);
         materialBuffer.putInt(24, metalnessMap == null ? 0 : 1);
         materialBuffer.putFloat(28, roughness);
-        materialBuffer.putFloat(32, emission.x());
-        materialBuffer.putFloat(36, emission.y());
-        materialBuffer.putFloat(40, emission.z());
-        materialBuffer.putInt(44, roughnessMap == null ? 0 : 1);
-        materialBuffer.putFloat(48, ambient.x());
-        materialBuffer.putFloat(52, ambient.y());
-        materialBuffer.putFloat(56, ambient.z());
-        materialBuffer.putInt(60, normalMap == null ? 0 : 1);
-        materialBuffer.putInt(64, emissionMap == null ? 0 : 1);
-        materialBuffer.putInt(68, ambientOcclusionMap == null ? 0 : 1);
+        materialBuffer.putInt(32, roughnessMap == null ? 0 : 1);
+        materialBuffer.putFloat(36, emission.x());
+        materialBuffer.putFloat(40, emission.y());
+        materialBuffer.putFloat(44, emission.z());
+        materialBuffer.putInt(48, emissionMap == null ? 0 : 1);
+        materialBuffer.putInt(54, ambientOcclusionMap == null ? 0 : 1);
 
         glBindBuffer(GL_UNIFORM_BUFFER, buffer);
         glBufferData(GL_UNIFORM_BUFFER, materialBuffer, GL_STATIC_DRAW);

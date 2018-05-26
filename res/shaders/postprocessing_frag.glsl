@@ -11,7 +11,7 @@ void main()
     // Tweak gamma correction value as you wish
     float gamma = 1.2;
     // Exposure is something else rather then real exposure
-    float exposure = 0.1;
+    float exposure = 0.8;
 
     fragment = vec4(pow(texture(color, uv_frag).rgb * exposure, vec3(1.0 / gamma)), 1.0);
 }

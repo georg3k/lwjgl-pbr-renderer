@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL31.*;
 
 /**
  * Main class - loads configuration and scene files and manages game loop
@@ -30,8 +31,10 @@ public class Orchid
     // Deferred pass data
     private static int deferredframeBuffer;
     private static int deferredPositionBuffer;
-    private static int deferredAlbedoMetalnessBuffer;
-    private static int deferredNormalRoughnessBuffer;
+    private static int deferredAlbedoBuffer;
+    private static int deferredNormalBuffer;
+    private static int deferredMetalnessBuffer;
+    private static int deferredRoughnessBuffer;
     private static int deferredEmissionBuffer;
     private static int deferredAmbientOcclusionBuffer;
 
@@ -197,12 +200,16 @@ public class Orchid
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, deferredPositionBuffer);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, deferredAlbedoMetalnessBuffer);
+        glBindTexture(GL_TEXTURE_2D, deferredAlbedoBuffer);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, deferredNormalRoughnessBuffer);
+        glBindTexture(GL_TEXTURE_2D, deferredNormalBuffer);
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, deferredEmissionBuffer);
+        glBindTexture(GL_TEXTURE_2D, deferredMetalnessBuffer);
         glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, deferredRoughnessBuffer);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, deferredEmissionBuffer);
+        glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, deferredAmbientOcclusionBuffer);
 
         drawRenderquad();
@@ -251,61 +258,82 @@ public class Orchid
 
         deferredPositionBuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, deferredPositionBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowWidth, windowHeight,
-                0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight,
+                0, GL_RGB, GL_FLOAT, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, deferredPositionBuffer, 0);
 
-        deferredAlbedoMetalnessBuffer = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, deferredAlbedoMetalnessBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight,
-                0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        deferredAlbedoBuffer = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, deferredAlbedoBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight,
+                0, GL_RGB, GL_FLOAT, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, deferredAlbedoMetalnessBuffer, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, deferredAlbedoBuffer, 0);
 
-        deferredNormalRoughnessBuffer = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, deferredNormalRoughnessBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight,
-                0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        deferredNormalBuffer = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, deferredNormalBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8_SNORM, windowWidth, windowHeight,
+                0, GL_RGB, GL_SHORT, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, deferredNormalRoughnessBuffer, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, deferredNormalBuffer, 0);
+
+        deferredMetalnessBuffer = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, deferredMetalnessBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, windowWidth, windowHeight,
+                0, GL_RED, GL_UNSIGNED_BYTE, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, deferredMetalnessBuffer, 0);
+
+        deferredRoughnessBuffer = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, deferredRoughnessBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, windowWidth, windowHeight,
+                0, GL_RED, GL_UNSIGNED_BYTE, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, deferredRoughnessBuffer, 0);
 
         deferredEmissionBuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, deferredEmissionBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowWidth, windowHeight,
-                0, GL_RGBA, GL_FLOAT, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight,
+                0, GL_RGB, GL_FLOAT, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, deferredEmissionBuffer, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, deferredEmissionBuffer, 0);
 
         deferredAmbientOcclusionBuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, deferredAmbientOcclusionBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowWidth, windowHeight,
-                0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, windowWidth, windowHeight,
+                0, GL_RED, GL_UNSIGNED_BYTE, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, deferredAmbientOcclusionBuffer, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, deferredAmbientOcclusionBuffer, 0);
 
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, sharedDepthbuffer);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            System.err.println("Deferred framebuffer is not ready");
+            System.err.println("Deferred framebuffer is not ready: " + glCheckFramebufferStatus(GL_FRAMEBUFFER));
+
 
         int attachments[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2,
-                GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4};
+                GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6};
 
         glDrawBuffers(attachments);
 
@@ -316,8 +344,9 @@ public class Orchid
     {
         glDeleteFramebuffers(deferredframeBuffer);
         glDeleteTextures(deferredPositionBuffer);
-        glDeleteTextures(deferredAlbedoMetalnessBuffer);
-        glDeleteTextures(deferredNormalRoughnessBuffer);
+        glDeleteTextures(deferredAlbedoBuffer);
+        glDeleteTextures(deferredNormalBuffer);
+        glDeleteTextures(deferredRoughnessBuffer);
         glDeleteTextures(deferredEmissionBuffer);
         glDeleteTextures(deferredAmbientOcclusionBuffer);
     }

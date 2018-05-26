@@ -26,9 +26,9 @@ out VS_OUT
 
 void main()
 {
-    vs_out.position = (view_matrix * model_matrix * vec4(position, 1.0)).xyz;
-    vs_out.normal = (view_matrix * model_matrix * vec4(normal, 0.0)).xyz;
-    vs_out.bitangent = (view_matrix * model_matrix * vec4(bitangent, 0.0)).xyz;
+    vs_out.position = (model_matrix * vec4(position, 1.0)).xyz;
+    vs_out.normal = (model_matrix * vec4(normal, 0.0)).xyz;
+    vs_out.bitangent = (model_matrix * vec4(bitangent, 0.0)).xyz;
     vs_out.uv = uv;
 
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(position, 1.0);
