@@ -286,4 +286,14 @@ public class Scene
             e.printStackTrace();
         }
     }
+
+    /**
+     * Cleans scene resources
+     */
+    public static void sceneCleanup()
+    {
+        skyboxCubemap.remove();
+        if (sceneTree != null)
+            sceneTree.remove();
+    }
 }

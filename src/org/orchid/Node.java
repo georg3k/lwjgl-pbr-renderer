@@ -180,9 +180,15 @@ public class Node
      */
     public void remove()
     {
-        parent.removeChild(this);
-        for (Node n : children)
+        if (parent != null)
+            parent.removeChild(this);
+
+        for (Node n : children) {
+            n.setParent(null);
             n.remove();
+        }
+
+        children.clear();
     }
 
     /**

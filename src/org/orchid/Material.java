@@ -227,6 +227,7 @@ public class Material
     public void setEmission(Vector3f emission)
     {
         this.emission.set(emission);
+        bufferUpdated = false;
     }
 
     /**
@@ -239,6 +240,7 @@ public class Material
     public void setEmission(float r, float g, float b)
     {
         emission.set(r, g, b);
+        bufferUpdated = false;
     }
 
     /**
@@ -280,7 +282,6 @@ public class Material
     public void setAmbientOcclusionMap(Texture ambientOcclusionMap)
     {
         this.ambientOcclusionMap = ambientOcclusionMap;
-        bufferUpdated = false;
     }
 
     /**
@@ -325,17 +326,18 @@ public class Material
         materialBuffer.putFloat(0, albedo.x());
         materialBuffer.putFloat(4, albedo.y());
         materialBuffer.putFloat(8, albedo.z());
-        materialBuffer.putInt(12, albedoMap == null ? 0 : 1);
-        materialBuffer.putInt(16, normalMap == null ? 0 : 1);
-        materialBuffer.putFloat(20, metalness);
-        materialBuffer.putInt(24, metalnessMap == null ? 0 : 1);
-        materialBuffer.putFloat(28, roughness);
-        materialBuffer.putInt(32, roughnessMap == null ? 0 : 1);
-        materialBuffer.putFloat(36, emission.x());
-        materialBuffer.putFloat(40, emission.y());
-        materialBuffer.putFloat(44, emission.z());
-        materialBuffer.putInt(48, emissionMap == null ? 0 : 1);
-        materialBuffer.putInt(54, ambientOcclusionMap == null ? 0 : 1);
+        materialBuffer.putFloat(12, albedo.w());
+        materialBuffer.putInt(16, albedoMap == null ? 0 : 1);
+        materialBuffer.putInt(20, normalMap == null ? 0 : 1);
+        materialBuffer.putFloat(24, metalness);
+        materialBuffer.putInt(28, metalnessMap == null ? 0 : 1);
+        materialBuffer.putFloat(32, roughness);
+        materialBuffer.putInt(36, roughnessMap == null ? 0 : 1);
+        materialBuffer.putInt(40, ambientOcclusionMap == null ? 0 : 1);
+        materialBuffer.putInt(46, emissionMap == null ? 0 : 1);
+        materialBuffer.putFloat(52, emission.x());
+        materialBuffer.putFloat(56, emission.y());
+        materialBuffer.putFloat(60, emission.z());
 
         glBindBuffer(GL_UNIFORM_BUFFER, buffer);
         glBufferData(GL_UNIFORM_BUFFER, materialBuffer, GL_STATIC_DRAW);

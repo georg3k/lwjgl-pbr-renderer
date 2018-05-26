@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL31.*;
+import static org.lwjgl.opengl.GL31.GL_RGB8_SNORM;
 
 /**
  * Main class - loads configuration and scene files and manages game loop
@@ -21,7 +21,6 @@ public class Orchid
     // Skybox data
     private static int skyboxCubeArray;
     private static int skyboxVerticesBuffer;
-    private static Cubemap skyboxCubemap;
 
     // Output render quad data
     private static int renderQuadArray;
@@ -156,7 +155,8 @@ public class Orchid
             Scene.update();
 
             deferredPass();
-            skyboxPass();
+            if(Scene.getSkybox() != null)
+                skyboxPass();
             forwardPass();
             postprocessingPass();
 
@@ -167,6 +167,7 @@ public class Orchid
         cleanupFramebuffer();
         cleanupRenderquad();
         cleanupSkybox();
+        Scene.sceneCleanup();
     }
 
     private static void skyboxPass()
@@ -176,7 +177,7 @@ public class Orchid
 
         skyboxShader.use();
         glActiveTexture(GL_TEXTURE10);
-        skyboxCubemap.use();
+        Scene.getSkybox().use();
         drawSkybox();
 
     }
@@ -268,8 +269,8 @@ public class Orchid
 
         deferredAlbedoBuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, deferredAlbedoBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight,
-                0, GL_RGB, GL_FLOAT, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowWidth, windowHeight,
+                0, GL_RGBA, GL_FLOAT, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -480,16 +481,6 @@ public class Orchid
                 1.0f, -1.0f, 1.0f
         };
 
-        String[] skyboxPaths = {
-                "./res/textures/skybox_posx.hdr",
-                "./res/textures/skybox_negx.hdr",
-                "./res/textures/skybox_posy.hdr",
-                "./res/textures/skybox_negy.hdr",
-                "./res/textures/skybox_posz.hdr",
-                "./res/textures/skybox_negz.hdr",
-        };
-        skyboxCubemap = new Cubemap(skyboxPaths);
-
         skyboxCubeArray = glGenVertexArrays();
         glBindVertexArray(skyboxCubeArray);
 
@@ -512,7 +503,6 @@ public class Orchid
 
     private static void cleanupSkybox()
     {
-        skyboxCubemap.remove();
         glDeleteVertexArrays(skyboxCubeArray);
         glDeleteBuffers(verticesBuffer);
     }

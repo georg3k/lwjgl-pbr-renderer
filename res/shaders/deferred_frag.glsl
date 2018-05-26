@@ -18,16 +18,16 @@ layout (binding = 9) uniform sampler2D ambient_occlusion_map;
 // Order is significant in std140 layout. Don't break!
 layout (std140, binding = 2) uniform material_block
 {
-    vec3  material_albedo;
+    vec4  material_albedo;
     bool  material_has_albedo_map;
     bool  material_has_normal_map;
     float material_metalness;
     bool  material_has_metalness_map;
     float material_roughness;
     bool  material_has_roughness_map;
-    vec3  material_emission;
-    bool  material_has_emission_map;
     bool  material_has_ambient_occlusion_map;
+    bool  material_has_emission_map;
+    vec3  material_emission;
 };
 
 layout (location = 0) out vec3 position;
@@ -40,6 +40,9 @@ layout (location = 6) out float ambient_occlusion;
 
 void main()
 {
+    if(material_albedo.a == 0 || material_has_albedo_map && texture(albedo_map, vs_in.uv).a == 0)
+        discard;
+
     position = vs_in.position;
 
     albedo = material_albedo.rgb;
