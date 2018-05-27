@@ -16,17 +16,19 @@ Orchid is an **educational project in the field of real-time 3d computer graphic
 * Image based lighting
 * Light volumes
 
-## Screenshots
+## PBR shader with direct light sources preview:
 
-![PBR test](https://i.imgur.com/ciPhHnP.png "PBR shader exmaple")
+<p align="center">
+  <img src="https://i.imgur.com/ciPhHnP.png" width="600"/>
+</p>
 
-![Material sample](https://i.imgur.com/WfQBA7q.png "Rusty ball, bright interior")
+## PBR shader in different IBL environments(coming soon):
 
-![Material sample](https://i.imgur.com/nfNGXWJ.png "Shiny ball, bright interior")
-
-![Material sample](https://i.imgur.com/v0ghakQ.jpg "Wooden ball, exterior")
-
-
+<p align="center">
+  <img src="https://i.imgur.com/WfQBA7q.png" width="600"/>
+  <img src="https://i.imgur.com/nfNGXWJ.png" width="600"/>
+  <img src="https://i.imgur.com/v0ghakQ.jpg" width="600"/>
+</p>
 
 ## Build
 
