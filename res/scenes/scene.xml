@@ -18,14 +18,19 @@
                     <position>
                         <x>0.0</x>
                         <y>0.0</y>
-                        <z>3.0</z>
+                        <z>5.0</z>
                     </position>
                     <near>0.01</near>
                     <far>1000.0</far>
                     <fov>1.0</fov>
                 </camera>
             </node>
-            <node name="sphere">
+            <node name="box">
+                <rotation>
+                    <x>0.2</x>
+                    <y>0.0</y>
+                    <z>0.8</z>
+                </rotation>
                 <model>
                     <material>
                         <albedo_map>./res/textures/albedo.png</albedo_map>
@@ -35,7 +40,7 @@
                         <metalness>1.0</metalness>
                         <roughness>1.0</roughness>
                     </material>
-                    <mesh_path>./res/meshes/sphere.fbx</mesh_path>
+                    <mesh_path>./res/meshes/box.fbx</mesh_path>
                 </model>
             </node>
         </node>

@@ -79,4 +79,12 @@ public class Shader
     {
         glUseProgram(program);
     }
+
+    /**
+     * Remove shader from VRAM
+     */
+    public void remove()
+    {
+        glDeleteShader(program);
+    }
 }

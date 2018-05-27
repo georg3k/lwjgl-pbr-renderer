@@ -72,6 +72,16 @@ public class Scene
     }
 
     /**
+     * Main camera getter
+     *
+     * @return main camera
+     */
+    public static Camera getMainCamera()
+    {
+        return mainCamera;
+    }
+
+    /**
      * Loads scene
      *
      * @param path path to scene file
@@ -182,7 +192,8 @@ public class Scene
                             break;
                         case "albedo":
                             material.setAlbedo(Float.parseFloat(characters.get(0)), Float.parseFloat(characters.get(1)),
-                                    Float.parseFloat(characters.get(2)), Float.parseFloat(characters.get(3)));
+                                    Float.parseFloat(characters.get(2)),
+                                    characters.size() == 4 ? Float.parseFloat(characters.get(3)) : 1.0f);
                             characters.clear();
                             break;
                         case "metalness":

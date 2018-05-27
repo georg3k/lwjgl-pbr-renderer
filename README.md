@@ -18,6 +18,8 @@ Orchid is an **educational project in the field of real-time 3d computer graphic
 
 ## Screenshots
 
+![PBR test](https://i.imgur.com/ciPhHnP.png "PBR shader exmaple")
+
 ![Material sample](https://i.imgur.com/WfQBA7q.png "Rusty ball, bright interior")
 
 ![Material sample](https://i.imgur.com/nfNGXWJ.png "Shiny ball, bright interior")
