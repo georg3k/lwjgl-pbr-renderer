@@ -18,6 +18,14 @@
             <positive_z>./res/textures/irradiance_posz.hdr</positive_z>
             <negative_x>./res/textures/irradiance_negz.hdr</negative_x>
         </skybox_irradiance>
+        <skybox_radiance>
+            <positive_x>./res/textures/radiance_posx.hdr</positive_x>
+            <negative_x>./res/textures/radiance_negx.hdr</negative_x>
+            <positive_y>./res/textures/radiance_posy.hdr</positive_y>
+            <negative_y>./res/textures/radiance_negy.hdr</negative_y>
+            <positive_z>./res/textures/radiance_posz.hdr</positive_z>
+            <negative_x>./res/textures/radiance_negz.hdr</negative_x>
+        </skybox_radiance>
     </environment>
     <tree>
         <node name="root">
@@ -30,7 +38,7 @@
                     </position>
                     <near>0.01</near>
                     <far>1000.0</far>
-                    <fov>1.0</fov>
+                    <fov>1.2</fov>
                 </camera>
             </node>
             <node name="sphere">

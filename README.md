@@ -10,24 +10,17 @@ Orchid is an **educational project in the field of real-time 3d computer graphic
 * Deferred rendering
 * HDR (auto-adjustment is yet to come)
 * Physically Based Rendering (metallic workflow)
+* PBR compatible IBL
 
 ## Currently in progress
 
-* Image based lighting
 * Light volumes
+* Shadow mapping
 
-## PBR shader with direct light sources preview:
-
-<p align="center">
-  <img src="https://i.imgur.com/ciPhHnP.png" width="600"/>
-</p>
-
-## PBR shader in different IBL environments(coming soon):
+## Screenshots
 
 <p align="center">
   <img src="https://i.imgur.com/WfQBA7q.png" width="600"/>
-  <img src="https://i.imgur.com/nfNGXWJ.png" width="600"/>
-  <img src="https://i.imgur.com/v0ghakQ.jpg" width="600"/>
 </p>
 
 ## Build

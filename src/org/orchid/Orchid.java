@@ -49,6 +49,7 @@ public class Orchid
     private static Shader combineShader;
     private static Shader postprocessingShader;
     private static Shader skyboxShader;
+    private static Texture BRDFLookUp;
 
     private static double deltaTime;
 
@@ -134,6 +135,8 @@ public class Orchid
         skyboxShader = new Shader("./res/shaders/skybox_vertex.glsl",
                 "./res/shaders/skybox_frag.glsl");
 
+        BRDFLookUp = new Texture("./res/brdf.png");
+
 
         genDepthbuffer();
         genDeferredFramebuffer();
@@ -213,9 +216,11 @@ public class Orchid
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, deferredAmbientOcclusionBuffer);
         glActiveTexture(GL_TEXTURE7);
-        Scene.getSkybox().use();
+        Scene.getSkyboxRadiance().use();
         glActiveTexture(GL_TEXTURE8);
         Scene.getSkyboxIrradiance().use();
+        glActiveTexture(GL_TEXTURE9);
+        BRDFLookUp.use();
 
         drawRenderquad();
     }

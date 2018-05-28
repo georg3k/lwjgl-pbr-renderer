@@ -99,6 +99,8 @@ public class Mesh extends Node
      */
     public void loadMesh(AIMesh aiMesh)
     {
+        // TODO: Optimization needed
+
         FloatBuffer vertices = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);
         FloatBuffer normals = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);
         FloatBuffer bitangents = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);

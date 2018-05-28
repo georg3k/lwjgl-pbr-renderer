@@ -23,6 +23,7 @@ public class Scene
     private static Material defaultMaterial = new Material();
     private static Cubemap skyboxCubemap = null;
     private static Cubemap skyboxIrradianceCubemap = null;
+    private static Cubemap skyboxRadianceCubemap = null;
 
     /**
      * Updates scene
@@ -62,6 +63,7 @@ public class Scene
         return skyboxCubemap;
     }
 
+
     /**
      * Scenes skybox cubemap setter
      *
@@ -71,6 +73,17 @@ public class Scene
     {
         skyboxCubemap = skybox;
     }
+
+    /**
+     * Scenes skybox cubemap setter
+     *
+     * @param irradiance irradiance cubemap
+     */
+    public static void setSkyboxIrradiance(Cubemap irradiance)
+    {
+        skyboxIrradianceCubemap = irradiance;
+    }
+
 
     /**
      * Scenes skybox irradiance cubemap getter
@@ -83,13 +96,23 @@ public class Scene
     }
 
     /**
-     * Scenes skybox cubemap setter
+     * Scenes skybox radiance cubemap setter
      *
-     * @param irradiance irradiance cubemap
+     * @param radiance radiance cubemap
      */
-    public static void setSkyboxIrradiance(Cubemap irradiance)
+    public static void setSkyboxRadiance(Cubemap radiance)
     {
-        skyboxIrradianceCubemap = irradiance;
+        skyboxRadianceCubemap = radiance;
+    }
+
+    /**
+     * Scenes skybox radiance cubemap getter
+     *
+     * @return radiance cubemap
+     */
+    public static Cubemap getSkyboxRadiance()
+    {
+        return skyboxRadianceCubemap;
     }
 
     /**
@@ -184,6 +207,12 @@ public class Scene
                             strings = new String[characters.size()];
                             characters.toArray(strings);
                             skyboxIrradianceCubemap = new Cubemap(strings);
+                            characters.clear();
+                            break;
+                        case "skybox_radiance":
+                            strings = new String[characters.size()];
+                            characters.toArray(strings);
+                            skyboxRadianceCubemap = new Cubemap(strings);
                             characters.clear();
                             break;
                         case "node":

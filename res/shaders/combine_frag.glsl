@@ -13,8 +13,9 @@ layout (binding = 4) uniform sampler2D roughness;
 layout (binding = 5) uniform sampler2D emission;
 layout (binding = 6) uniform sampler2D ambient_occlusion;
 
-layout (binding = 7) uniform samplerCube skybox;
+layout (binding = 7) uniform samplerCube radiance;
 layout (binding = 8) uniform samplerCube irradiance;
+layout (binding = 9) uniform sampler2D BRDFlookUp;
 
 layout (location = 0) out vec4 fragment;
 
@@ -29,7 +30,7 @@ float DistributionGGX(vec3 N, vec3 H, float rough)
      float a      = rough*rough;
      float a2     = a*a;
      float NdotH  = max(dot(N, H), 0.0);
-     float NdotH2 = NdotH*NdotH;
+     float NdotH2 = NdotH * NdotH;
 
      float num   = a2;
      float denom = (NdotH2 * (a2 - 1.0) + 1.0);
@@ -49,7 +50,7 @@ float DistributionGGX(vec3 N, vec3 H, float rough)
      return num / denom;
  }
 
- vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float rough)
+ vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float rough)
  {
      return F0 + (max(vec3(1.0 - rough), F0) - F0) * pow(1.0 - cosTheta, 5.0);
  }
@@ -69,10 +70,10 @@ void main()
     // Real scene lights are not implemented yet so I am using these "built-it" for testing
     vec3 light_positions[] = { vec3( -5, -5, -5), vec3( 5, -5, -5), vec3( 5, 5, -5), vec3( -5, 5, -5),
                                vec3( -5, -5,  5), vec3( 5, -5,  5), vec3( 5, 5, -5), vec3( -5, 5,  5)};
-    vec3 light_color = vec3(100.0, 100.0, 100.0);
+    vec3 light_color = vec3(50.0, 50.0, 50.0);
 
     float metalness_value = texture(metalness, uv_frag).r;
-    float roughness_value = texture(roughness, uv_frag).r;
+    float roughness_value = 1.0;//texture(roughness, uv_frag).r;
     float ambient_occlusion_value = texture(ambient_occlusion, uv_frag).r;
     vec3 position_value = texture(position, uv_frag).xyz;
     vec3 albedo_value = texture(albedo, uv_frag).rgb;
@@ -83,10 +84,19 @@ void main()
 
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo_value, metalness_value);
-    vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness_value);
+    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness_value);
+    vec3 kS = F;
     vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metalness_value;
     vec3 diffuse = texture(irradiance, N).rgb * albedo_value;
-    vec3 ambient = (kD * diffuse) * ambient_occlusion_value;
+
+    vec3 R = reflect(-V, N);
+
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefiltered_radiance = textureCubeLod(radiance, R, roughness_value * MAX_REFLECTION_LOD).rgb;
+    vec2 radianceBRDF = texture(BRDFlookUp, vec2(max(dot(N, V), 0.0), roughness_value)).rg;
+    vec3 radianceSpecular = prefiltered_radiance * (F * radianceBRDF.x + radianceBRDF.y);
+    vec3 ambient = (kD * diffuse + radianceSpecular) * ambient_occlusion_value;
 
     vec3 Lo = vec3(0.0);
 
@@ -115,5 +125,5 @@ void main()
         Lo += (kD * albedo_value / PI + specular) * radiance * NdotL;
     }
 
-    fragment = vec4(Lo + ambient + emission_value, 1.0);
+    fragment = vec4(Lo + ambient, 1.0);
 }
