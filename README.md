@@ -22,7 +22,11 @@ Orchid is an **educational project in the field of real-time 3d computer graphic
 ## Screenshots
 
 <p align="center">
-  <img src="https://i.imgur.com/WfQBA7q.png" width="600"/>
+  <img src="https://i.imgur.com/LepyTAH.png" width="600"/>
+
+  <img src="https://i.imgur.com/LLdgCEG.png" width="600"/>
+
+  <img src="https://i.imgur.com/nfNGXWJ.png" width="600"/>
 </p>
 
 ## Build
