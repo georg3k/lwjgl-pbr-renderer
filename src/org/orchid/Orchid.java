@@ -212,6 +212,10 @@ public class Orchid
         glBindTexture(GL_TEXTURE_2D, deferredEmissionBuffer);
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, deferredAmbientOcclusionBuffer);
+        glActiveTexture(GL_TEXTURE7);
+        Scene.getSkybox().use();
+        glActiveTexture(GL_TEXTURE8);
+        Scene.getSkyboxIrradiance().use();
 
         drawRenderquad();
     }

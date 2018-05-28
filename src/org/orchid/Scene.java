@@ -22,6 +22,7 @@ public class Scene
     private static ArrayList<Mesh> transparentMeshes = new ArrayList<>();
     private static Material defaultMaterial = new Material();
     private static Cubemap skyboxCubemap = null;
+    private static Cubemap skyboxIrradianceCubemap = null;
 
     /**
      * Updates scene
@@ -69,6 +70,26 @@ public class Scene
     public static void setSkybox(Cubemap skybox)
     {
         skyboxCubemap = skybox;
+    }
+
+    /**
+     * Scenes skybox irradiance cubemap getter
+     *
+     * @return irradiance cubemap
+     */
+    public static Cubemap getSkyboxIrradiance()
+    {
+        return skyboxIrradianceCubemap;
+    }
+
+    /**
+     * Scenes skybox cubemap setter
+     *
+     * @param irradiance irradiance cubemap
+     */
+    public static void setSkyboxIrradiance(Cubemap irradiance)
+    {
+        skyboxIrradianceCubemap = irradiance;
     }
 
     /**
@@ -157,6 +178,12 @@ public class Scene
                             String[] strings = new String[characters.size()];
                             characters.toArray(strings);
                             skyboxCubemap = new Cubemap(strings);
+                            characters.clear();
+                            break;
+                        case "skybox_irradiance":
+                            strings = new String[characters.size()];
+                            characters.toArray(strings);
+                            skyboxIrradianceCubemap = new Cubemap(strings);
                             characters.clear();
                             break;
                         case "node":

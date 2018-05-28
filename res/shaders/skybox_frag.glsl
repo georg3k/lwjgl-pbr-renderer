@@ -8,5 +8,5 @@ layout (location = 0) out vec4 fragment;
 
 void main()
 {
-    fragment = 0.2 * texture(skybox, uv_frag);
+    fragment = texture(skybox, uv_frag);
 }

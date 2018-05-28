@@ -1,6 +1,6 @@
 #version 420 core
 
-#define     PI 3.1415926535897932384626433832795
+#define     PI 3.1415926
 
 in vec2 uv_frag;
 in vec3 camera_position;
@@ -12,6 +12,9 @@ layout (binding = 3) uniform sampler2D metalness;
 layout (binding = 4) uniform sampler2D roughness;
 layout (binding = 5) uniform sampler2D emission;
 layout (binding = 6) uniform sampler2D ambient_occlusion;
+
+layout (binding = 7) uniform samplerCube skybox;
+layout (binding = 8) uniform samplerCube irradiance;
 
 layout (location = 0) out vec4 fragment;
 
@@ -45,6 +48,11 @@ float DistributionGGX(vec3 N, vec3 H, float rough)
 
      return num / denom;
  }
+
+ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float rough)
+ {
+     return F0 + (max(vec3(1.0 - rough), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+ }
  
  float GeometrySmith(vec3 N, vec3 V, vec3 L, float rough)
  {
@@ -65,6 +73,7 @@ void main()
 
     float metalness_value = texture(metalness, uv_frag).r;
     float roughness_value = texture(roughness, uv_frag).r;
+    float ambient_occlusion_value = texture(ambient_occlusion, uv_frag).r;
     vec3 position_value = texture(position, uv_frag).xyz;
     vec3 albedo_value = texture(albedo, uv_frag).rgb;
     vec3 emission_value = texture(emission, uv_frag).rgb;
@@ -72,8 +81,14 @@ void main()
     vec3 N = normalize(texture(normal, uv_frag).xyz);
     vec3 V = normalize(camera_position - position_value);
 
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo_value, metalness_value);
+    vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness_value);
+    vec3 kD = 1.0 - kS;
+    vec3 diffuse = texture(irradiance, N).rgb * albedo_value;
+    vec3 ambient = (kD * diffuse) * ambient_occlusion_value;
+
     vec3 Lo = vec3(0.0);
-    
 
     for(int i = 0; i < 8; i++)
     {
@@ -84,8 +99,6 @@ void main()
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = light_color * attenuation;
 
-        vec3 F0 = vec3(0.04);
-        F0 = mix(F0, albedo_value, metalness_value);
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
         float NDF = DistributionGGX(N, H, roughness_value);
         float G = GeometrySmith(N, V, L, roughness_value);
@@ -101,9 +114,6 @@ void main()
         float NdotL = max(dot(N, L), 0.0);
         Lo += (kD * albedo_value / PI + specular) * radiance * NdotL;
     }
-
-    // Hardcoded ambient until IBL is not implemented
-    vec3 ambient = vec3(0.1) * albedo_value * texture(ambient_occlusion, uv_frag).r;
 
     fragment = vec4(Lo + ambient + emission_value, 1.0);
 }
