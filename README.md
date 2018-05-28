@@ -1,3 +1,5 @@
+<img src="https://i.imgur.com/H15zQvJ.png" align="right" width="120"/>
+
 # Orchid
 
 Orchid is an **educational project in the field of real-time 3d computer graphics**. It is written in Java and using OpenGL API.
