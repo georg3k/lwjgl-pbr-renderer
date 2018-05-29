@@ -86,6 +86,7 @@ public class Texture
         stbi_image_free(textureData);
 
         loadedTextures.put(path, texture);
+        loadedInstances.put(path, 1);
     }
 
     /**
