@@ -1,6 +1,6 @@
 #version 420 core
 
-#define     PI 3.1415926
+#define PI 3.1415926
 
 in vec2 uv_frag;
 in vec3 camera_position;
@@ -19,7 +19,6 @@ layout (binding = 9) uniform sampler2D BRDFlookUp;
 
 layout (location = 0) out vec4 fragment;
 
-// Schlick fresnel
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
@@ -70,10 +69,10 @@ void main()
     // Real scene lights are not implemented yet so I am using these "built-it" for testing
     vec3 light_positions[] = { vec3( -5, -5, -5), vec3( 5, -5, -5), vec3( 5, 5, -5), vec3( -5, 5, -5),
                                vec3( -5, -5,  5), vec3( 5, -5,  5), vec3( 5, 5, -5), vec3( -5, 5,  5)};
-    vec3 light_color = vec3(50.0, 50.0, 50.0);
+    vec3 light_color = vec3(25.0, 25.0, 25.0);
 
     float metalness_value = texture(metalness, uv_frag).r;
-    float roughness_value = 1.0;//texture(roughness, uv_frag).r;
+    float roughness_value = texture(roughness, uv_frag).r;
     float ambient_occlusion_value = texture(ambient_occlusion, uv_frag).r;
     vec3 position_value = texture(position, uv_frag).xyz;
     vec3 albedo_value = texture(albedo, uv_frag).rgb;
@@ -125,5 +124,5 @@ void main()
         Lo += (kD * albedo_value / PI + specular) * radiance * NdotL;
     }
 
-    fragment = vec4(Lo + ambient, 1.0);
+    fragment = vec4(Lo + emission_value + ambient, 1.0);
 }

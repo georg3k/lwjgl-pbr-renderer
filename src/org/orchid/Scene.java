@@ -25,11 +25,14 @@ public class Scene
     private static Cubemap skyboxIrradianceCubemap = null;
     private static Cubemap skyboxRadianceCubemap = null;
 
+    static float rot = 0.0f;
+
     /**
      * Updates scene
      */
     public static void update()
     {
+        sceneTree.getChild(0).setRotation(0.0f, rot += Orchid.getDeltaTime() * 0.2f, 0.0f);
         sceneTree.update();
     }
 
@@ -290,7 +293,8 @@ public class Scene
                             characters.clear();
                             break;
                         case "transparent":
-                            isMeshOpaque = false;
+                            isMeshOpaque = Boolean.parseBoolean(characters.get(0));
+                            characters.clear();
                             break;
                         case "mesh_path":
                             AIScene aiScene = Assimp.aiImportFile(characters.get(0), Assimp.aiProcess_Triangulate

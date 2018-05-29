@@ -119,10 +119,6 @@ public class Orchid
         deferredShader = new Shader("./res/shaders/deferred_vertex.glsl",
                 "./res/shaders/deferred_frag.glsl");
 
-        // Forward shader loading
-        forwardShader = new Shader("./res/shaders/forward_vertex.glsl",
-                "./res/shaders/forward_frag.glsl");
-
         // Combining shader loading
         combineShader = new Shader("./res/shaders/combine_vertex.glsl",
                 "./res/shaders/combine_frag.glsl");
@@ -157,10 +153,13 @@ public class Orchid
 
             Scene.update();
 
+            glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             deferredPass();
             if(Scene.getSkybox() != null)
                 skyboxPass();
-            forwardPass();
+
             postprocessingPass();
 
             glfwPollEvents();
@@ -175,7 +174,6 @@ public class Orchid
 
     private static void skyboxPass()
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
         glEnable(GL_DEPTH_TEST);
 
         skyboxShader.use();
@@ -188,19 +186,14 @@ public class Orchid
     private static void deferredPass()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, deferredframeBuffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         deferredShader.use();
         glEnable(GL_DEPTH_TEST);
         Scene.drawOpaque();
 
-        glDisable(GL_DEPTH_TEST);
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
         combineShader.use();
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, deferredPositionBuffer);
         glActiveTexture(GL_TEXTURE1);
@@ -222,16 +215,9 @@ public class Orchid
         glActiveTexture(GL_TEXTURE9);
         BRDFLookUp.use();
 
+        glDepthMask(false);
         drawRenderquad();
-    }
-
-    private static void forwardPass()
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-
-        forwardShader.use();
-        glEnable(GL_DEPTH_TEST);
-        Scene.drawTransparent();
+        glDepthMask(true);
     }
 
     private static void postprocessingPass()
