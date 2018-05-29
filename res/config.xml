@@ -17,6 +17,6 @@
     </property>
     <property>
         <name>main_scene</name>
-        <value>./res/scenes/pbr_test.xml</value>
+        <value>./res/scenes/scene.xml</value>
     </property>
 </configuration>

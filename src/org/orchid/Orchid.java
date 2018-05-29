@@ -131,7 +131,7 @@ public class Orchid
         skyboxShader = new Shader("./res/shaders/skybox_vertex.glsl",
                 "./res/shaders/skybox_frag.glsl");
 
-        BRDFLookUp = new Texture("./res/brdf.png");
+        BRDFLookUp = new Texture("./res/brdf.png", 3);
 
 
         genDepthbuffer();

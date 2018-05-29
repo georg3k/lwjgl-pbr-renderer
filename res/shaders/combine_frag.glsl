@@ -69,7 +69,7 @@ void main()
     // Real scene lights are not implemented yet so I am using these "built-it" for testing
     vec3 light_positions[] = { vec3( -5, -5, -5), vec3( 5, -5, -5), vec3( 5, 5, -5), vec3( -5, 5, -5),
                                vec3( -5, -5,  5), vec3( 5, -5,  5), vec3( 5, 5, -5), vec3( -5, 5,  5)};
-    vec3 light_color = vec3(25.0, 25.0, 25.0);
+    vec3 light_color = vec3(10.0, 10.0, 10.0);
 
     float metalness_value = texture(metalness, uv_frag).r;
     float roughness_value = texture(roughness, uv_frag).r;

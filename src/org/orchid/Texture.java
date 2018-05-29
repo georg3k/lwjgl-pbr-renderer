@@ -8,26 +8,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class Texture
 {
     private static Map<String, Integer> loadedTextures = new HashMap<>();
+    private static Map<String, Integer> loadedInstances = new HashMap<>();
 
-    int texture;
+    private int texture;
+    private String path;
 
     /**
      * Constructor
      *
      * @param path path to texture image file
      */
-    public Texture(String path)
+    public Texture(String path, int channels)
     {
+        this.path = path;
+
         if(loadedTextures.containsKey(path))
         {
             texture = loadedTextures.get(path);
+            loadedInstances.put(path, loadedInstances.get(path) + 1);
             return;
         }
 
@@ -37,7 +42,7 @@ public class Texture
         ByteBuffer textureData = null;
 
         try {
-            textureData = stbi_load(path, textureWidth, textureHeight, textureChannels, 4);
+            textureData = stbi_load(path, textureWidth, textureHeight, textureChannels, channels);
         } catch (Exception e) {
             System.err.println("Texture \"" + path + "\" loading failed");
             e.printStackTrace();
@@ -50,8 +55,31 @@ public class Texture
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth.get(0), textureHeight.get(0), 0,
-                GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+        int format = 0;
+        int internal = 0;
+        switch (channels) {
+            case 1:
+                format = GL_R8;
+                internal = GL_RED;
+                break;
+            case 2:
+                format = GL_RG8;
+                internal = GL_RG;
+                break;
+            case 3:
+                format = GL_RGB8;
+                internal = GL_RGB;
+                break;
+            case 4:
+                format = GL_RGBA8;
+                internal = GL_RGBA;
+                break;
+            default:
+                throw new RuntimeException("Wrong texture channel count: " + channels);
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, textureWidth.get(0), textureHeight.get(0), 0,
+                internal, GL_UNSIGNED_BYTE, textureData);
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -73,6 +101,10 @@ public class Texture
      */
     public void remove()
     {
+        loadedInstances.put(path, loadedInstances.get(path) - 1);
+        if (loadedInstances.get(path) != 0)
+            return;
+
         glDeleteTextures(texture);
     }
 }

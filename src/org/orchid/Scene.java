@@ -269,27 +269,27 @@ public class Scene
                             characters.clear();
                             break;
                         case "albedo_map":
-                            material.setAlbedoMap(new Texture(characters.get(0)));
+                            material.setAlbedoMap(new Texture(characters.get(0), 4));
                             characters.clear();
                             break;
                         case "metalness_map":
-                            material.setMetalnessMap(new Texture(characters.get(0)));
+                            material.setMetalnessMap(new Texture(characters.get(0), 1));
                             characters.clear();
                             break;
                         case "roughness_map":
-                            material.setRoughnessMap(new Texture(characters.get(0)));
+                            material.setRoughnessMap(new Texture(characters.get(0), 1));
                             characters.clear();
                             break;
                         case "normal_map":
-                            material.setNormalMap(new Texture(characters.get(0)));
+                            material.setNormalMap(new Texture(characters.get(0), 3));
                             characters.clear();
                             break;
                         case "emission_map":
-                            material.setEmissionMap(new Texture(characters.get(0)));
+                            material.setEmissionMap(new Texture(characters.get(0), 3));
                             characters.clear();
                             break;
                         case "ambient_occlusion_map":
-                            material.setAmbientOcclusionMap(new Texture(characters.get(0)));
+                            material.setAmbientOcclusionMap(new Texture(characters.get(0), 1));
                             characters.clear();
                             break;
                         case "transparent":
@@ -300,7 +300,7 @@ public class Scene
                             AIScene aiScene = Assimp.aiImportFile(characters.get(0), Assimp.aiProcess_Triangulate
                                     | Assimp.aiProcess_FlipUVs | Assimp.aiProcess_CalcTangentSpace);
 
-                            node.addChild(loadModel(aiScene.mRootNode(), aiScene));
+                            node.addChild(loadModel(aiScene.mRootNode(), aiScene, characters.get(0)));
                             characters.clear();
                             isMeshOpaque = true;
                             material = null;
@@ -308,7 +308,7 @@ public class Scene
                     }
                 }
 
-                private Node loadModel(AINode aiNode, AIScene aiScene)
+                private Node loadModel(AINode aiNode, AIScene aiScene, String scenePath)
                 {
                     Node node = new Node(aiNode.mName().dataString());
 
@@ -333,7 +333,7 @@ public class Scene
                     for (int i = 0; i < aiNode.mNumMeshes(); i++) {
                         AIMesh aiMesh = AIMesh.create(aiScene.mMeshes().get(aiNode.mMeshes().get(i)));
                         Mesh mesh = new Mesh(aiMesh.mName().dataString(), node);
-                        mesh.loadMesh(aiMesh);
+                        mesh.loadMesh(aiMesh, scenePath);
 
                         if (isMeshOpaque)
                             opaqueMeshes.add(mesh);
@@ -347,7 +347,7 @@ public class Scene
                     }
 
                     for (int i = 0; i < aiNode.mNumChildren(); i++)
-                        node.addChild(loadModel(AINode.create(aiNode.mChildren().get(i)), aiScene));
+                        node.addChild(loadModel(AINode.create(aiNode.mChildren().get(i)), aiScene, scenePath));
 
                     return node;
                 }

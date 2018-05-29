@@ -5,6 +5,8 @@ import org.lwjgl.assimp.AIMesh;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -28,6 +30,10 @@ public class Mesh extends Node
 
     private boolean matrixUpdated = false;
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+
+    private static Map<String, Mesh> loadedMeshes = new HashMap<>();
+    private static Map<String, Integer> loadedInstances = new HashMap<>();
+    private String mapName;
 
     /**
      * Constructor
@@ -62,12 +68,21 @@ public class Mesh extends Node
     @Override
     public void remove()
     {
-        glDeleteVertexArrays(vao);
         glDeleteBuffers(ubo);
+        loadedInstances.put(mapName, loadedInstances.get(mapName) - 1);
+
+        if (loadedInstances.get(mapName) != 0)
+            return;
+
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(ebo);
         glDeleteBuffers(verticesBuffer);
         glDeleteBuffers(normalsBuffer);
         glDeleteBuffers(bitangentsBuffer);
         glDeleteBuffers(uvsBuffer);
+
+        loadedMeshes.remove(mapName);
+        loadedInstances.remove(mapName);
 
         super.remove();
     }
@@ -97,9 +112,17 @@ public class Mesh extends Node
      *
      * @param aiMesh Assimp mesh
      */
-    public void loadMesh(AIMesh aiMesh)
+    public void loadMesh(AIMesh aiMesh, String scenePath)
     {
-        // TODO: Optimization needed
+        mapName = aiMesh.mName().dataString() + "@" + scenePath;
+
+        if (loadedMeshes.containsKey(mapName)) {
+            Mesh loaded = loadedMeshes.get(mapName);
+            vao = loaded.vao;
+            numFaces = loaded.numFaces;
+            loadedInstances.put(mapName, loadedInstances.get(mapName) + 1);
+            return;
+        }
 
         FloatBuffer vertices = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);
         FloatBuffer normals = BufferUtils.createFloatBuffer(aiMesh.mNumVertices() * 3);
@@ -190,6 +213,9 @@ public class Mesh extends Node
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
 
         glBindVertexArray(0);
+
+        loadedMeshes.put(mapName, this);
+        loadedInstances.put(mapName, 1);
     }
 
     /**
