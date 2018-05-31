@@ -112,6 +112,8 @@ public class Orchid
 
         glDepthFunc(GL_LEQUAL);
 
+        Input.init(window);
+
         // Scene loading invokes some of GL functions so it should be performed after context creation
         Scene.loadScene(Configuration.getProperty("main_scene"));
 
@@ -133,7 +135,6 @@ public class Orchid
 
         BRDFLookUp = new Texture("./res/brdf.png", 3);
 
-
         genDepthbuffer();
         genDeferredFramebuffer();
         genFramebuffer();
@@ -151,6 +152,7 @@ public class Orchid
             deltaTime = currentTime - lastTime;
             lastTime = currentTime;
 
+            Input.update();
             Scene.update();
 
             glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
