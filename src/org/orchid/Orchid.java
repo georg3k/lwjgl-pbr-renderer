@@ -141,16 +141,9 @@ public class Orchid
         genRenderquad();
         genSkybox();
 
-        double lastTime = 0.0;
-        double currentTime;
-
-        float rot = 0.0f;
-
         while (!glfwWindowShouldClose(window))
         {
-            currentTime = glfwGetTime();
-            deltaTime = currentTime - lastTime;
-            lastTime = currentTime;
+            Time.updateDelta();
 
             Input.update();
             Scene.update();
