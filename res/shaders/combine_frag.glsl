@@ -124,5 +124,5 @@ void main()
         Lo += (kD * albedo_value / PI + specular) * radiance * NdotL;
     }
 
-    fragment = vec4(Lo + emission_value + ambient, 1.0);
+    fragment = vec4(Lo + ambient + emission_value, 1.0);
 }
