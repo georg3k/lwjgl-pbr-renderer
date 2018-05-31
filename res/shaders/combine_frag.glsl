@@ -6,15 +6,10 @@ in vec2 uv_frag;
 in vec3 camera_position;
 
 layout (binding = 0) uniform sampler2D position;
-layout (binding = 1) uniform sampler2D albedo;
-layout (binding = 2) uniform sampler2D normal;
-layout (binding = 3) uniform sampler2D metalness;
-layout (binding = 4) uniform sampler2D roughness;
-layout (binding = 5) uniform sampler2D emission;
-layout (binding = 6) uniform sampler2D ambient_occlusion;
+layout (binding = 1) uniform sampler2D albedo_metalness;
+layout (binding = 2) uniform sampler2D normal_roughness;
+layout (binding = 3) uniform sampler2D environment_emission;
 
-layout (binding = 7) uniform samplerCube radiance;
-layout (binding = 8) uniform samplerCube irradiance;
 layout (binding = 9) uniform sampler2D BRDFlookUp;
 
 layout (location = 0) out vec4 fragment;
@@ -71,31 +66,15 @@ void main()
                                vec3( -5, -5,  5), vec3( 5, -5,  5), vec3( 5, 5, -5), vec3( -5, 5,  5)};
     vec3 light_color = vec3(10.0, 10.0, 10.0);
 
-    float metalness_value = texture(metalness, uv_frag).r;
-    float roughness_value = texture(roughness, uv_frag).r;
-    float ambient_occlusion_value = texture(ambient_occlusion, uv_frag).r;
-    vec3 position_value = texture(position, uv_frag).xyz;
-    vec3 albedo_value = texture(albedo, uv_frag).rgb;
-    vec3 emission_value = texture(emission, uv_frag).rgb;
+    float metalness_value = texture(albedo_metalness, uv_frag).a;
+    float roughness_value = texture(normal_roughness, uv_frag).a;
 
-    vec3 N = normalize(texture(normal, uv_frag).xyz);
+    vec3 position_value = texture(position, uv_frag).rgb;
+    vec3 albedo_value = texture(albedo_metalness, uv_frag).rgb;
+    vec3 environment_emission_value = texture(environment_emission, uv_frag).rgb;
+
+    vec3 N = normalize(texture(normal_roughness, uv_frag).rgb);
     vec3 V = normalize(camera_position - position_value);
-
-    vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo_value, metalness_value);
-    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness_value);
-    vec3 kS = F;
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metalness_value;
-    vec3 diffuse = texture(irradiance, N).rgb * albedo_value;
-
-    vec3 R = reflect(-V, N);
-
-    const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefiltered_radiance = textureCubeLod(radiance, R, roughness_value * MAX_REFLECTION_LOD).rgb;
-    vec2 radianceBRDF = texture(BRDFlookUp, vec2(max(dot(N, V), 0.0), roughness_value)).rg;
-    vec3 radianceSpecular = prefiltered_radiance * (F * radianceBRDF.x + radianceBRDF.y);
-    vec3 ambient = (kD * diffuse + radianceSpecular) * ambient_occlusion_value;
 
     vec3 Lo = vec3(0.0);
 
@@ -108,6 +87,7 @@ void main()
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = light_color * attenuation;
 
+        vec3 F0 = vec3(0.04);
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
         float NDF = DistributionGGX(N, H, roughness_value);
         float G = GeometrySmith(N, V, L, roughness_value);
@@ -124,5 +104,5 @@ void main()
         Lo += (kD * albedo_value / PI + specular) * radiance * NdotL;
     }
 
-    fragment = vec4(Lo + ambient + emission_value, 1.0);
+    fragment = vec4(Lo + environment_emission_value, 1.0);
 }
