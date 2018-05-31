@@ -49,12 +49,12 @@ void main()
     if(material_has_albedo_map)
         albedo *= texture(albedo_map, vs_in.uv).rgb;
 
-    if(material_has_normal_map)
+    /*if(material_has_normal_map)
     {
         mat3 texture_space_matrix = mat3(normalize(cross(vs_in.bitangent, vs_in.normal)), vs_in.bitangent, vs_in.normal);
         normal = texture_space_matrix * normalize(texture(normal_map, vs_in.uv).rgb * 2.0 - 1.0);
     }
-    else
+    else*/
         normal = vs_in.normal.xyz;
 
     metalness = material_metalness;

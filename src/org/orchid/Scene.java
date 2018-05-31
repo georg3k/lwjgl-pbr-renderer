@@ -32,7 +32,7 @@ public class Scene
      */
     public static void update()
     {
-        sceneTree.getChild(0).setRotation(0.0f, rot += Orchid.getDeltaTime() * 0.2f, 0.0f);
+        sceneTree.getChild(0).setRotation(0.0f, rot += Time.getDeltaTime() * 0.5f, 0.0f);
         sceneTree.update();
     }
 
@@ -155,8 +155,7 @@ public class Scene
 
                 String[] valuebleString =
                         {
-                                "positive_x", "negative_x", "positive_y", "negative_y", "positive_z", "negative_z",
-                                "x", "y", "z", "r", "g", "b", "a",
+                                "path", "extension", "x", "y", "z", "r", "g", "b", "a",
                                 "metalness", "roughness",
                                 "albedo_map", "metalness_map", "roughness_map", "normal_map", "emission_map", "ambient_occlusion_map",
                                 "mesh_path", "transparent",
@@ -201,21 +200,15 @@ public class Scene
                 {
                     switch (globalName) {
                         case "skybox":
-                            String[] strings = new String[characters.size()];
-                            characters.toArray(strings);
-                            skyboxCubemap = new Cubemap(strings);
+                            skyboxCubemap = new Cubemap(characters.get(0), characters.get(1), false);
                             characters.clear();
                             break;
                         case "skybox_irradiance":
-                            strings = new String[characters.size()];
-                            characters.toArray(strings);
-                            skyboxIrradianceCubemap = new Cubemap(strings);
+                            skyboxIrradianceCubemap = new Cubemap(characters.get(0), characters.get(1), false);
                             characters.clear();
                             break;
                         case "skybox_radiance":
-                            strings = new String[characters.size()];
-                            characters.toArray(strings);
-                            skyboxRadianceCubemap = new Cubemap(strings);
+                            skyboxRadianceCubemap = new Cubemap(characters.get(0), characters.get(1), true);
                             characters.clear();
                             break;
                         case "node":

@@ -3,28 +3,16 @@
 <scene>
     <environment>
         <skybox>
-            <positive_x>./res/textures/skybox_posx.hdr</positive_x>
-            <negative_x>./res/textures/skybox_negx.hdr</negative_x>
-            <positive_y>./res/textures/skybox_posy.hdr</positive_y>
-            <negative_y>./res/textures/skybox_negy.hdr</negative_y>
-            <positive_z>./res/textures/skybox_posz.hdr</positive_z>
-            <negative_x>./res/textures/skybox_negz.hdr</negative_x>
+            <path>./res/textures/skybox</path>
+            <extension>.hdr</extension>
         </skybox>
         <skybox_irradiance>
-            <positive_x>./res/textures/irradiance_posx.hdr</positive_x>
-            <negative_x>./res/textures/irradiance_negx.hdr</negative_x>
-            <positive_y>./res/textures/irradiance_posy.hdr</positive_y>
-            <negative_y>./res/textures/irradiance_negy.hdr</negative_y>
-            <positive_z>./res/textures/irradiance_posz.hdr</positive_z>
-            <negative_x>./res/textures/irradiance_negz.hdr</negative_x>
+            <path>./res/textures/irradiance</path>
+            <extension>.hdr</extension>
         </skybox_irradiance>
         <skybox_radiance>
-            <positive_x>./res/textures/radiance_posx.hdr</positive_x>
-            <negative_x>./res/textures/radiance_negx.hdr</negative_x>
-            <positive_y>./res/textures/radiance_posy.hdr</positive_y>
-            <negative_y>./res/textures/radiance_negy.hdr</negative_y>
-            <positive_z>./res/textures/radiance_posz.hdr</positive_z>
-            <negative_x>./res/textures/radiance_negz.hdr</negative_x>
+            <path>./res/textures/radiance</path>
+            <extension>.hdr</extension>
         </skybox_radiance>
     </environment>
     <tree>
