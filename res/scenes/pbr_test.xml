@@ -43,9 +43,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.0</metalness>
                         <roughness>0.0</roughness>
@@ -67,9 +67,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.2</metalness>
                         <roughness>0.0</roughness>
@@ -91,9 +91,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.4</metalness>
                         <roughness>0.0</roughness>
@@ -115,9 +115,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.6</metalness>
                         <roughness>0.0</roughness>
@@ -139,9 +139,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.8</metalness>
                         <roughness>0.0</roughness>
@@ -163,9 +163,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>1.0</metalness>
                         <roughness>0.0</roughness>
@@ -189,9 +189,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.0</metalness>
                         <roughness>0.2</roughness>
@@ -213,9 +213,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.2</metalness>
                         <roughness>0.2</roughness>
@@ -237,9 +237,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.4</metalness>
                         <roughness>0.2</roughness>
@@ -261,9 +261,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.6</metalness>
                         <roughness>0.2</roughness>
@@ -285,9 +285,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.8</metalness>
                         <roughness>0.2</roughness>
@@ -309,9 +309,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>1.0</metalness>
                         <roughness>0.2</roughness>
@@ -335,9 +335,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.0</metalness>
                         <roughness>0.4</roughness>
@@ -359,9 +359,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.2</metalness>
                         <roughness>0.4</roughness>
@@ -383,9 +383,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.4</metalness>
                         <roughness>0.4</roughness>
@@ -407,9 +407,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.6</metalness>
                         <roughness>0.4</roughness>
@@ -431,9 +431,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.8</metalness>
                         <roughness>0.4</roughness>
@@ -455,9 +455,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>1.0</metalness>
                         <roughness>0.4</roughness>
@@ -479,9 +479,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.0</metalness>
                         <roughness>0.6</roughness>
@@ -503,9 +503,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.2</metalness>
                         <roughness>0.6</roughness>
@@ -527,9 +527,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.4</metalness>
                         <roughness>0.6</roughness>
@@ -551,9 +551,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.6</metalness>
                         <roughness>0.6</roughness>
@@ -575,9 +575,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.8</metalness>
                         <roughness>0.6</roughness>
@@ -599,9 +599,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>1.0</metalness>
                         <roughness>0.6</roughness>
@@ -623,9 +623,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.0</metalness>
                         <roughness>0.8</roughness>
@@ -647,9 +647,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.2</metalness>
                         <roughness>0.8</roughness>
@@ -671,9 +671,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.4</metalness>
                         <roughness>0.8</roughness>
@@ -695,9 +695,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.6</metalness>
                         <roughness>0.8</roughness>
@@ -719,9 +719,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.8</metalness>
                         <roughness>0.8</roughness>
@@ -743,9 +743,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>1.0</metalness>
                         <roughness>0.8</roughness>
@@ -767,9 +767,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.0</metalness>
                         <roughness>1.0</roughness>
@@ -791,9 +791,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.2</metalness>
                         <roughness>1.0</roughness>
@@ -815,9 +815,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.4</metalness>
                         <roughness>1.0</roughness>
@@ -839,9 +839,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.6</metalness>
                         <roughness>1.0</roughness>
@@ -863,9 +863,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>0.8</metalness>
                         <roughness>1.0</roughness>
@@ -887,9 +887,9 @@
                     </scale>
                     <material>
                         <albedo>
-                            <r>1.0</r>
-                            <g>0.0</g>
-                            <b>0.0</b>
+                            <r>0.0</r>
+                            <g>1.0</g>
+                            <b>1.0</b>
                         </albedo>
                         <metalness>1.0</metalness>
                         <roughness>1.0</roughness>
