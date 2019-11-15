@@ -14,10 +14,7 @@ Orchid is an **educational project in the field of real-time 3d computer graphic
 * Physically Based Rendering (metallic workflow)
 * PBR compatible IBL
 
-## Currently in progress
-
-* Light volumes
-* Shadow mapping
+**_Project suspended_**
 
 ## Screenshots
 
